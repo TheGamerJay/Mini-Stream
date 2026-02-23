@@ -1,7 +1,10 @@
 import os
 import secrets
+import logging
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
+
+logger = logging.getLogger(__name__)
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -68,8 +71,8 @@ def signup():
                 </div>
             ''',
         })
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error('Welcome email failed for %s: %s', email, e)
 
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
@@ -240,8 +243,8 @@ def forgot_password():
                     </div>
                 ''',
             })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error('Reset email failed for %s: %s', email, e)
 
     return jsonify({'message': 'If that email is registered, a reset link has been sent.'})
 
