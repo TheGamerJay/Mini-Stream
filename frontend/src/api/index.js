@@ -53,11 +53,11 @@ export const updateProfile = (data) => api.put('/auth/profile', data)
 export const forgotPassword = (data) => api.post('/auth/forgot-password', data)
 export const resetPassword = (data) => api.post('/auth/reset-password', data)
 
-// Discover
-export const getHomeData = () => api.get('/discover/home')
-export const search = (params) => api.get('/discover/search', { params })
-export const getGenres = () => api.get('/discover/genres')
-export const browseVideos = (params) => api.get('/discover/browse', { params })
+// Stream
+export const getHomeData = () => api.get('/stream/home')
+export const search = (params) => api.get('/stream/search', { params })
+export const getGenres = () => api.get('/stream/genres')
+export const browseVideos = (params) => api.get('/stream/browse', { params })
 
 // Videos
 export const getVideo = (id) => api.get(`/videos/${id}`)

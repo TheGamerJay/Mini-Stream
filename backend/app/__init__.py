@@ -50,7 +50,7 @@ def create_app(config_name=None):
     app.register_blueprint(videos_bp, url_prefix='/api/videos')
     app.register_blueprint(series_bp, url_prefix='/api/series')
     app.register_blueprint(creator_bp, url_prefix='/api/creator')
-    app.register_blueprint(discover_bp, url_prefix='/api/discover')
+    app.register_blueprint(discover_bp, url_prefix='/api/stream')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(studio_bp, url_prefix='/api/studio')
 
