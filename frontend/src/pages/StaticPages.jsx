@@ -141,19 +141,20 @@ export function Privacy() {
 export function Terms() {
   return (
     <StaticPage title="Terms of Service">
-      <p>By using MiniStream, you agree to these terms.</p>
+      <p>By using MiniStream, you agree to these Terms of Service.</p>
       <h2>Accounts</h2>
-      <p>You are responsible for maintaining the security of your account. Do not share your credentials.</p>
+      <p>You are responsible for maintaining the security of your account. Do not share your login credentials with others. Any activity that occurs under your account is your responsibility.</p>
       <h2>Content</h2>
-      <p>Creators retain all rights to their original content. By uploading, you grant MiniStream a non-exclusive license to host and display your content on the platform. You may remove your content at any time by deleting it from your dashboard.</p>
+      <p>Creators retain all rights to their original content. By uploading content to MiniStream, you grant MiniStream a non-exclusive license to host, store, and display your content on the platform.</p>
+      <p>You may remove your content at any time by deleting it from your dashboard.</p>
       <h2>Prohibited Use</h2>
-      <p>You may not use MiniStream to upload content that violates our <Link to="/content-rules">Content Rules</Link>, infringe intellectual property rights, or violate any applicable law.</p>
+      <p>You may not use MiniStream to upload content that violates the platform's <Link to="/content-rules">Content Rules</Link>, infringes intellectual property rights, or violates any applicable laws or regulations.</p>
       <h2>Termination</h2>
-      <p>MiniStream reserves the right to suspend or terminate accounts that violate these terms.</p>
+      <p>MiniStream reserves the right to suspend or terminate accounts that violate these Terms of Service or other platform policies.</p>
       <h2>Disclaimer</h2>
-      <p>MiniStream is provided as-is. We make no warranties regarding uptime or content accuracy.</p>
+      <p>MiniStream is provided on an "as-is" basis. We make no guarantees regarding platform availability, uptime, or the accuracy of user-generated content.</p>
       <h2>Changes</h2>
-      <p>We may update these terms. Continued use of the platform constitutes acceptance.</p>
+      <p>MiniStream may update these terms from time to time. Continued use of the platform after changes are made constitutes acceptance of the updated terms.</p>
     </StaticPage>
   )
 }
