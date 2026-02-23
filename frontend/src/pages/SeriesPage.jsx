@@ -45,6 +45,7 @@ export default function SeriesPage() {
           <div className="series-info">
             <div className="series-tags">
               <span className="tag tag-cyan">{series.genre}</span>
+              {series.language && <span className="tag tag-neutral">{series.language}</span>}
               <span className="tag tag-violet">Series</span>
             </div>
             <h1 className="series-title">{series.title}</h1>

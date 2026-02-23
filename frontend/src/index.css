@@ -105,6 +105,7 @@ input, textarea, select { font-family: inherit; }
 }
 .tag-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,212,255,0.2); }
 .tag-violet { background: var(--violet-dim); color: #a855f7; border: 1px solid rgba(168,85,247,0.2); }
+.tag-neutral { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--border); }
 
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }

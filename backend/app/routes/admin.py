@@ -300,11 +300,12 @@ _STANDALONE = [
     (2, '8th Man — Pilot', 'Seinen',
      'A detective is killed in the line of duty and resurrected as a cybernetic superhero. Dark 1960s anime.',
      'Mature',
-     'https://archive.org/download/tobor-the-8th-man/Ep1-Pilot.mp4'),
+     None),
     (0, 'Jungle Emperor — Episode 1', 'Shojo',
      'Kimba the white lion cub journeys from Africa to Japan in search of his destiny. Tezuka\'s classic 1965 anime.',
      'General',
-     'https://archive.org/download/jungletaitei/Jungle%20Taitei%20(1965)%20-%2001%20%5B1080p%5D.mp4'),
+     'https://archive.org/download/jungletaitei/Jungle%20Taitei%20(1965)%20-%2001%20%5B1080p%5D.mp4',
+     'Japanese'),
     (1, 'Speed Racer — The New Adventures Ep. 1', 'Shonen',
      'Go Mifune returns in an all-new high-speed adventure. 1993 revival series.',
      'General',
@@ -356,11 +357,13 @@ def seed_demo():
             ))
             vi += 1
 
-    for i, (ci, title, genre, desc, rating, specific_url) in enumerate(_STANDALONE):
+    for i, entry in enumerate(_STANDALONE):
+        ci, title, genre, desc, rating, specific_url = entry[:6]
+        lang = entry[6] if len(entry) > 6 else 'English'
         c = creators[ci]
         db.session.add(Video(
             creator_id=c.id, title=title, description=desc,
-            genre=genre, language='English', video_type='Standalone',
+            genre=genre, language=lang, video_type='Standalone',
             content_rating=rating, video_url=specific_url or _vurl(vi),
             thumbnail_url=_thumb(f"solo{i}"),
             duration=600 + i * 120, view_count=80 + i * 53,

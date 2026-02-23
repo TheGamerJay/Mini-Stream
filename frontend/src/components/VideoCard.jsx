@@ -43,6 +43,8 @@ export default function VideoCard({ item, type = 'video' }) {
           )}
           {item.genre && <span className="dot">·</span>}
           {item.genre && <span>{item.genre}</span>}
+          {item.language && <span className="dot">·</span>}
+          {item.language && <span className="video-card__lang">{item.language}</span>}
         </div>
         {isVideo && item.series_title && (
           <p className="video-card__series">{item.series_title}</p>

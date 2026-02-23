@@ -110,6 +110,7 @@
   flex-wrap: wrap;
 }
 .dot { color: var(--text-muted); }
+.video-card__lang { font-size: 0.72rem; color: var(--text-muted); opacity: 0.7; }
 .video-card__creator-wrap {
   display: inline-flex;
   align-items: center;
