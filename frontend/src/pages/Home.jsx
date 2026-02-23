@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import HeroBanner from '../components/HeroBanner'
 import HorizontalRow from '../components/HorizontalRow'
 import VideoCard from '../components/VideoCard'
+import { useAuth } from '../context/AuthContext'
 import { getHomeData, search as searchApi } from '../api'
 import './Home.css'
 
 const GENRES = ['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Drama', 'Comedy']
 
 export default function Home() {
+  const { user } = useAuth()
   const [homeData, setHomeData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -60,6 +62,12 @@ export default function Home() {
 
   return (
     <div className="home-page">
+      {!user && (
+        <div className="home-guest-notice">
+          Browsing is available to all users. Viewing content requires an account.{' '}
+          <Link to="/signup">Create a free account</Link> or <Link to="/login">sign in</Link>.
+        </div>
+      )}
       {!searchResults && homeData?.featured && (
         <HeroBanner featured={homeData.featured} />
       )}

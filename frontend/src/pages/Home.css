@@ -1,5 +1,19 @@
 .home-page { padding-top: 70px; }
 
+.home-guest-notice {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  padding: 10px 24px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.home-guest-notice a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+.home-guest-notice a:hover { text-decoration: underline; }
+
 .home-content { padding: 40px 24px 60px; }
 
 .home-search { margin-bottom: 40px; }

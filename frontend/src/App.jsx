@@ -43,8 +43,8 @@ function AppRoutes() {
           <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
           <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
           <Route path="/home" element={<Home />} />
-          <Route path="/watch/:id" element={<Watch />} />
-          <Route path="/series/:id" element={<SeriesPage />} />
+          <Route path="/watch/:id" element={<PrivateRoute><Watch /></PrivateRoute>} />
+          <Route path="/series/:id" element={<PrivateRoute><SeriesPage /></PrivateRoute>} />
           <Route path="/watch-later" element={<PrivateRoute><WatchLater /></PrivateRoute>} />
           <Route path="/become-creator" element={<PrivateRoute><BecomeCreator /></PrivateRoute>} />
           <Route path="/creator" element={<PrivateRoute><CreatorDashboard /></PrivateRoute>} />
