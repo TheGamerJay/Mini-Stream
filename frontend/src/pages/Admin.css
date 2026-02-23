@@ -67,6 +67,29 @@
   border-color: rgba(0, 212, 255, 0.5);
 }
 
+.admin-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-password-wrap input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.admin-eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+  color: inherit;
+}
+
 .admin-login-btn {
   width: 100%;
   padding: 12px;
