@@ -91,7 +91,7 @@ export default function Landing() {
       <section className="landing-genres container">
         <h2 className="section-title">Every Genre, One Place</h2>
         <div className="genres-grid">
-          {['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery'].map((g) => (
+          {['Anime', 'Action', 'Adventure', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Thriller', 'Supernatural', 'Isekai', 'Psychological', 'Experimental'].map((g) => (
             <Link key={g} to={`/home?genre=${encodeURIComponent(g)}`} className="genre-chip">
               {g}
             </Link>

@@ -57,28 +57,41 @@ export function HowItWorks() {
 export function ContentRules() {
   return (
     <StaticPage title="Content Rules">
-      <p>MiniStream is a platform for original creative work. By uploading, you agree to these rules.</p>
-      <h2>You May Upload</h2>
+      <p>MiniStream is a platform for creators to share original anime-style series, animated shorts, and indie visual storytelling. By uploading, you agree to these rules.</p>
+      <h2>Creator Responsibility</h2>
+      <p>Creators are fully responsible for the content they upload. By uploading to MiniStream, creators confirm they have the rights to publish their content and that it complies with these rules and all applicable laws.</p>
+      <p>MiniStream does not actively pre-screen uploads.</p>
+      <h2>Allowed Content</h2>
       <ul>
         <li>Original videos, series, and animations you created</li>
         <li>Content for which you hold all necessary rights</li>
-        <li>Fan works where you own all original elements (no copyrighted audio, footage, or characters without a clear license)</li>
+        <li>Fan-inspired works (non-commercial, clearly labeled, no impersonation of real creators or official franchises)</li>
+        <li>Fictional violence, fantasy themes, and mature storytelling (properly tagged)</li>
+        <li>Experimental, indie, or stylized content</li>
       </ul>
-      <h2>You May Not Upload</h2>
+      <h2>Content Labeling</h2>
+      <p>Creators must accurately label their content using genre tags and content warnings where applicable (violence, horror, sensitive themes, maturity level). Mislabeling content may result in removal.</p>
+      <h2>Prohibited Content</h2>
       <ul>
         <li>Content you do not own or have rights to distribute</li>
-        <li>Content from other platforms (YouTube, Netflix, Crunchyroll, etc.)</li>
-        <li>Hate speech, harassment, or content targeting individuals</li>
-        <li>Explicit sexual content</li>
+        <li>Content reuploaded from other platforms without permission</li>
         <li>Illegal content of any kind</li>
-        <li>Real-world violence or gore</li>
+        <li>Child sexual exploitation or sexualized depictions of minors</li>
+        <li>Non-consensual sexual content</li>
+        <li>Extreme gore intended solely to shock</li>
+        <li>Real-world hate speech or harassment targeting protected groups</li>
+        <li>Content that promotes real-world violence or terrorism</li>
+        <li>Impersonation of real creators or official franchises</li>
       </ul>
+      <h2>AI-Generated Content</h2>
+      <p>AI-assisted or AI-generated content is allowed if the creator has the right to use the tools involved, the content is original and not a direct copy of existing works, and AI usage is disclosed where applicable.</p>
       <h2>Enforcement</h2>
-      <p>MiniStream does not actively pre-screen user uploads. However, MiniStream reserves the right to review, remove, or restrict access to any content that violates these rules or applicable laws.</p>
-      <p>Creators are solely responsible for the content they upload. Repeated or serious violations may result in account suspension or permanent termination.</p>
-      <p>MiniStream reserves the right, at its sole discretion, to remove content or limit access to the platform for material that is unlawful, harmful, abusive, or otherwise inconsistent with the purpose and standards of the platform.</p>
-      <h2>DMCA</h2>
-      <p>To report copyright infringement, please visit our <Link to="/dmca">DMCA page</Link>.</p>
+      <p>MiniStream reserves the right, at its sole discretion, to remove content or restrict access to the platform if content is found to violate these rules, applicable laws, or the purpose of the platform.</p>
+      <p>Repeated or severe violations may result in account suspension or permanent termination. MiniStream may take action without prior notice.</p>
+      <h2>Reporting</h2>
+      <p>To report content you believe violates these rules, please contact us at <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a>. For copyright issues, see our <Link to="/dmca">DMCA page</Link>.</p>
+      <h2>Disclaimer</h2>
+      <p>MiniStream is a hosting platform for user-generated content. The views and works shared by creators do not reflect the views of MiniStream.</p>
     </StaticPage>
   )
 }

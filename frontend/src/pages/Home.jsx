@@ -7,7 +7,12 @@ import { useAuth } from '../context/AuthContext'
 import { getHomeData, search as searchApi } from '../api'
 import './Home.css'
 
-const GENRES = ['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Drama', 'Comedy']
+const GENRES = [
+  'Anime', 'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance',
+  'Horror', 'Supernatural', 'Thriller', 'Sci-Fi', 'Mystery', 'Psychological',
+  'Slice of Life', 'Mecha', 'Isekai', 'Historical', 'Seinen', 'Shojo', 'Shonen',
+  'Experimental',
+]
 
 export default function Home() {
   const { user } = useAuth()
