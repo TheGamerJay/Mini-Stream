@@ -16,7 +16,7 @@ const GENRES = [
 ]
 const LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
 const VIDEO_TYPES = ['Standalone', 'Episode', 'Short / Clip', 'Trailer / Teaser', 'Announcement']
-const RATINGS = ['General', 'Mature']
+const RATINGS = ['G', 'PG', 'PG-13', 'R', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'NR']
 
 function StatsBar({ stats }) {
   return (

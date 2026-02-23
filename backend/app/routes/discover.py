@@ -11,7 +11,7 @@ GENRES = [
     'Experimental',
 ]
 LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
-RATINGS = ['TV-G', 'TV-PG', 'TV-14', 'TV-MA']
+RATINGS = ['G', 'PG', 'PG-13', 'R', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'NR']
 
 
 @discover_bp.route('/home', methods=['GET'])

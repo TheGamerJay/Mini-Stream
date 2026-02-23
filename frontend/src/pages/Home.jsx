@@ -12,7 +12,7 @@ const GENRES = [
   'Horror','Supernatural','Thriller','Sci-Fi','Mystery','Psychological',
   'Slice of Life','Mecha','Isekai','Historical','Seinen','Shojo','Shonen','Experimental',
 ]
-const RATINGS = ['TV-G', 'TV-PG', 'TV-14', 'TV-MA']
+const RATINGS = ['G', 'PG', 'PG-13', 'R', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'NR']
 
 export default function Home() {
   const { user } = useAuth()
