@@ -39,8 +39,8 @@ export default function Landing() {
             animated shorts, and indie visual storytelling. No ads. No noise. Just content.
           </p>
           <div className="landing-hero__actions">
-            <Link to="/signup" className="btn btn-primary landing-cta">Get Started</Link>
-            <Link to="/home" className="btn btn-ghost">Explore Content</Link>
+            <Link to="/home" className="btn btn-primary landing-cta">Start Watching</Link>
+            <Link to="/signup" className="btn btn-ghost">Create Account</Link>
           </div>
         </div>
         <div className="landing-hero__preview">
