@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './StaticPages.css'
 
 function StaticPage({ title, children }) {
@@ -48,7 +49,7 @@ export function HowItWorks() {
         <li>Manage your content and monitor views privately from the Creator Dashboard.</li>
       </ol>
       <h2>Content Guidelines</h2>
-      <p>All content must be original and owned by the creator. Stolen, copyrighted, or prohibited content will be removed. See our <a href="/content-rules">Content Rules</a> for details.</p>
+      <p>All content must be original and owned by the creator. Stolen, copyrighted, or prohibited content will be removed. See our <Link to="/content-rules">Content Rules</Link> for details.</p>
     </StaticPage>
   )
 }
@@ -75,7 +76,7 @@ export function ContentRules() {
       <h2>Enforcement</h2>
       <p>MiniStream does not actively pre-screen uploads but will remove content that violates these rules. Creators are fully responsible for the content they upload. Repeated violations will result in account termination.</p>
       <h2>DMCA</h2>
-      <p>To report copyright infringement, please visit our <a href="/dmca">DMCA page</a>.</p>
+      <p>To report copyright infringement, please visit our <Link to="/dmca">DMCA page</Link>.</p>
     </StaticPage>
   )
 }
@@ -85,7 +86,7 @@ export function DMCA() {
     <StaticPage title="Copyright / DMCA">
       <p>MiniStream respects intellectual property rights. If you believe content on this platform infringes your copyright, please submit a DMCA takedown notice.</p>
       <h2>How to Submit a DMCA Notice</h2>
-      <p>Send an email to <strong>dmca@ministream.app</strong> with the following information:</p>
+      <p>Send an email to <strong>ministream.help@gmail.com</strong> with the following information:</p>
       <ol>
         <li>Your full legal name and contact information</li>
         <li>A description of the copyrighted work you claim has been infringed</li>
@@ -123,9 +124,9 @@ export function Privacy() {
         <li>We do not use your data for advertising targeting</li>
       </ul>
       <h2>Data Retention</h2>
-      <p>We retain account data as long as your account is active. You may request deletion by contacting us at privacy@ministream.app.</p>
+      <p>We retain account data as long as your account is active. You may request deletion by contacting us at ministream.help@gmail.com.</p>
       <h2>Contact</h2>
-      <p>For privacy concerns, contact privacy@ministream.app.</p>
+      <p>For privacy concerns, contact ministream.help@gmail.com.</p>
     </StaticPage>
   )
 }
@@ -139,7 +140,7 @@ export function Terms() {
       <h2>Content</h2>
       <p>Creators retain all rights to their original content. By uploading, you grant MiniStream a non-exclusive license to host and display your content on the platform. You may remove your content at any time by deleting it from your dashboard.</p>
       <h2>Prohibited Use</h2>
-      <p>You may not use MiniStream to upload content that violates our <a href="/content-rules">Content Rules</a>, infringe intellectual property rights, or violate any applicable law.</p>
+      <p>You may not use MiniStream to upload content that violates our <Link to="/content-rules">Content Rules</Link>, infringe intellectual property rights, or violate any applicable law.</p>
       <h2>Termination</h2>
       <p>MiniStream reserves the right to suspend or terminate accounts that violate these terms.</p>
       <h2>Disclaimer</h2>
@@ -155,11 +156,11 @@ export function Contact() {
     <StaticPage title="Contact">
       <p>Have a question or need support? Reach out to us below.</p>
       <h2>General Inquiries</h2>
-      <p>Email: <a href="mailto:hello@ministream.app">hello@ministream.app</a></p>
+      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
       <h2>DMCA / Copyright</h2>
-      <p>Email: <a href="mailto:dmca@ministream.app">dmca@ministream.app</a></p>
+      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
       <h2>Privacy</h2>
-      <p>Email: <a href="mailto:privacy@ministream.app">privacy@ministream.app</a></p>
+      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
       <p className="note">We aim to respond within 3–5 business days.</p>
     </StaticPage>
   )
