@@ -62,6 +62,7 @@ def signup():
                     <h2 style="color:#00d4ff;margin-bottom:8px;">Welcome, {display_name}!</h2>
                     <p style="color:#a0a0b0;">You&apos;re officially part of MiniStream — the home of original stories and indie creators.</p>
                     <p style="color:#a0a0b0;">Start exploring content from creators around the world, or apply to become a creator yourself and share your story.</p>
+                    <p style="color:#606070;font-size:0.9em;">You&apos;re in control — no spam, no algorithms, no noise.</p>
                     <div style="text-align:center;margin:28px 0;">
                         <a href="{base_url}/home" style="display:inline-block;padding:12px 32px;background:#00d4ff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;margin-right:12px;">Browse Content</a>
                         <a href="{base_url}/become-creator" style="display:inline-block;padding:12px 32px;background:transparent;color:#00d4ff;border:2px solid #00d4ff;border-radius:8px;text-decoration:none;font-weight:700;">Become a Creator</a>
