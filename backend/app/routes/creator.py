@@ -14,7 +14,7 @@ def require_creator(f):
     @wraps(f)
     @jwt_required()
     def decorated(*args, **kwargs):
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         if not user or not user.is_creator:
             return jsonify({'error': 'Creator account required'}), 403
@@ -25,7 +25,7 @@ def require_creator(f):
 @creator_bp.route('/upload', methods=['POST'])
 @require_creator
 def upload_video():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
 
     if 'video' not in request.files:
         return jsonify({'error': 'No video file provided'}), 400
@@ -91,7 +91,7 @@ def upload_video():
 @creator_bp.route('/series', methods=['POST'])
 @require_creator
 def create_series():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     if not data or not data.get('title') or not data.get('genre') or not data.get('language') or not data.get('description'):
         return jsonify({'error': 'Title, genre, language, and description are required'}), 400
@@ -113,7 +113,7 @@ def create_series():
 @creator_bp.route('/series/<int:series_id>', methods=['PUT'])
 @require_creator
 def update_series(series_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     series = Series.query.filter_by(id=series_id, creator_id=user_id).first_or_404()
     data = request.get_json()
 
@@ -133,7 +133,7 @@ def update_series(series_id):
 @creator_bp.route('/series/<int:series_id>/banner', methods=['POST'])
 @require_creator
 def upload_series_banner(series_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     series = Series.query.filter_by(id=series_id, creator_id=user_id).first_or_404()
 
     if 'banner' not in request.files and 'thumbnail' not in request.files:
@@ -161,7 +161,7 @@ def upload_series_banner(series_id):
 @creator_bp.route('/videos', methods=['GET'])
 @require_creator
 def get_my_videos():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     page = request.args.get('page', 1, type=int)
     paginated = (
         Video.query.filter_by(creator_id=user_id)
@@ -178,7 +178,7 @@ def get_my_videos():
 @creator_bp.route('/series-list', methods=['GET'])
 @require_creator
 def get_my_series():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     series = (
         Series.query.filter_by(creator_id=user_id)
         .order_by(Series.created_at.desc())
@@ -190,7 +190,7 @@ def get_my_series():
 @creator_bp.route('/videos/<int:video_id>', methods=['PUT'])
 @require_creator
 def update_video(video_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     video = Video.query.filter_by(id=video_id, creator_id=user_id).first_or_404()
     data = request.get_json()
 
@@ -214,7 +214,7 @@ def update_video(video_id):
 @creator_bp.route('/videos/<int:video_id>', methods=['DELETE'])
 @require_creator
 def delete_video(video_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     video = Video.query.filter_by(id=video_id, creator_id=user_id).first_or_404()
 
     if video.cloudinary_public_id:
@@ -233,7 +233,7 @@ def delete_video(video_id):
 @creator_bp.route('/stats', methods=['GET'])
 @require_creator
 def get_stats():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     total_videos = Video.query.filter_by(creator_id=user_id).count()
     total_views = (
         db.session.query(db.func.sum(Video.view_count))

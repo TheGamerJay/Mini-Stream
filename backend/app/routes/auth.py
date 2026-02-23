@@ -71,8 +71,8 @@ def signup():
     except Exception:
         pass
 
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
     return jsonify({
         'user': user.to_dict(),
         'access_token': access_token,
@@ -98,8 +98,8 @@ def login():
     if not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({'error': 'Invalid credentials'}), 401
 
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
     return jsonify({
         'user': user.to_dict(),
         'access_token': access_token,
@@ -142,8 +142,8 @@ def google_auth():
             db.session.add(user)
         db.session.commit()
 
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
     return jsonify({
         'user': user.to_dict(),
         'access_token': access_token,
@@ -155,14 +155,14 @@ def google_auth():
 @jwt_required(refresh=True)
 def refresh():
     user_id = get_jwt_identity()
-    access_token = create_access_token(identity=user_id)
+    access_token = create_access_token(identity=user_id)  # keep as str
     return jsonify({'access_token': access_token})
 
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def me():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -172,7 +172,7 @@ def me():
 @auth_bp.route('/become-creator', methods=['POST'])
 @jwt_required()
 def become_creator():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -184,7 +184,7 @@ def become_creator():
 @auth_bp.route('/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404

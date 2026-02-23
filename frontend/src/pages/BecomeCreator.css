@@ -52,6 +52,26 @@
   line-height: 1.5;
 }
 .bc-rules a { color: var(--cyan); }
+.bc-agree-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.bc-agree-checkbox input[type="checkbox"] {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+.bc-agree-checkbox a { color: var(--cyan); }
+.bc-agree-checkbox a:hover { text-decoration: underline; }
 .bc-btn { width: 100%; padding: 13px; font-size: 0.95rem; }
 .link-cyan { color: var(--cyan); font-weight: 600; }
 

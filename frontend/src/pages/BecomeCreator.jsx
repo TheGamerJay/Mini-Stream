@@ -7,6 +7,7 @@ import './BecomeCreator.css'
 export default function BecomeCreator() {
   const { user, refreshUser } = useAuth()
   const navigate = useNavigate()
+  const [agreed, setAgreed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -22,6 +23,10 @@ export default function BecomeCreator() {
   }
 
   const handleActivate = async () => {
+    if (!agreed) {
+      setError('You must agree to the Content Rules before activating.')
+      return
+    }
     setError('')
     setLoading(true)
     try {
@@ -54,15 +59,27 @@ export default function BecomeCreator() {
               <div className="bc-perk">Track views privately</div>
               <div className="bc-perk">No ads. No algorithm noise.</div>
             </div>
-            <div className="bc-rules">
-              <p>
-                By activating, you agree to our{' '}
-                <Link to="/content-rules">Content Rules</Link> and confirm you will only upload
-                content you own the rights to.
-              </p>
-            </div>
-            {error && <div className="auth-error">{error}</div>}
-            <button className="btn btn-primary bc-btn" onClick={handleActivate} disabled={loading}>
+
+            <label className="bc-agree-checkbox">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span>
+                I have read and agree to the{' '}
+                <Link to="/content-rules" target="_blank">Content Rules</Link> and confirm
+                I will only upload content I own the rights to.
+              </span>
+            </label>
+
+            {error && <div className="auth-error" style={{ marginTop: '12px' }}>{error}</div>}
+
+            <button
+              className="btn btn-primary bc-btn"
+              onClick={handleActivate}
+              disabled={loading || !agreed}
+            >
               {loading ? <span className="spinner spinner-sm" /> : 'Activate Creator Account — Free'}
             </button>
           </div>

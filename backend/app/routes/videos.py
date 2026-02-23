@@ -14,7 +14,7 @@ def get_video(video_id):
     if not video.is_published:
         try:
             verify_jwt_in_request(optional=True)
-            uid = get_jwt_identity()
+            uid = int(get_jwt_identity()) if get_jwt_identity() else None
             if uid != video.creator_id:
                 return jsonify({'error': 'Video not found'}), 404
         except Exception:
@@ -28,7 +28,7 @@ def get_video(video_id):
 @videos_bp.route('/watch-later', methods=['GET'])
 @jwt_required()
 def get_watch_later():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     items = (
         WatchLater.query.filter_by(user_id=user_id)
         .order_by(WatchLater.added_at.desc())
@@ -40,7 +40,7 @@ def get_watch_later():
 @videos_bp.route('/<int:video_id>/watch-later', methods=['POST'])
 @jwt_required()
 def add_watch_later(video_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     Video.query.get_or_404(video_id)
 
     existing = WatchLater.query.filter_by(user_id=user_id, video_id=video_id).first()
@@ -56,7 +56,7 @@ def add_watch_later(video_id):
 @videos_bp.route('/<int:video_id>/watch-later', methods=['DELETE'])
 @jwt_required()
 def remove_watch_later(video_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     wl = WatchLater.query.filter_by(user_id=user_id, video_id=video_id).first()
     if not wl:
         return jsonify({'error': 'Not in Watch Later'}), 404
@@ -68,6 +68,6 @@ def remove_watch_later(video_id):
 @videos_bp.route('/<int:video_id>/watch-later/status', methods=['GET'])
 @jwt_required()
 def watch_later_status(video_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     saved = WatchLater.query.filter_by(user_id=user_id, video_id=video_id).first() is not None
     return jsonify({'saved': saved})
