@@ -41,8 +41,8 @@ def upload_video():
     episode_number = request.form.get('episode_number', type=int)
     season_number = request.form.get('season_number', 1, type=int)
 
-    if not title or not genre:
-        return jsonify({'error': 'Title and genre are required'}), 400
+    if not title or not genre or not description or not language:
+        return jsonify({'error': 'Title, genre, language, and description are required'}), 400
 
     if series_id:
         series = Series.query.filter_by(id=series_id, creator_id=user_id).first()
@@ -93,8 +93,8 @@ def upload_video():
 def create_series():
     user_id = get_jwt_identity()
     data = request.get_json()
-    if not data or not data.get('title') or not data.get('genre'):
-        return jsonify({'error': 'Title and genre are required'}), 400
+    if not data or not data.get('title') or not data.get('genre') or not data.get('language') or not data.get('description'):
+        return jsonify({'error': 'Title, genre, language, and description are required'}), 400
 
     series = Series(
         creator_id=user_id,

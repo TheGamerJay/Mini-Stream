@@ -97,8 +97,8 @@ function UploadForm({ seriesList, onSuccess }) {
       </div>
 
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <textarea className="form-input" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe this video..." rows={3} />
+        <label className="form-label">Description *</label>
+        <textarea className="form-input" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe this video..." rows={3} required />
       </div>
 
       <div className="form-row">
@@ -185,8 +185,8 @@ function SeriesForm({ onSuccess }) {
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <textarea className="form-input" value={form.description} onChange={e => set('description', e.target.value)} placeholder="What is this series about?" rows={2} />
+        <label className="form-label">Description *</label>
+        <textarea className="form-input" value={form.description} onChange={e => set('description', e.target.value)} placeholder="What is this series about?" rows={2} required />
       </div>
       <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? <span className="spinner spinner-sm" /> : 'Create Series'}
