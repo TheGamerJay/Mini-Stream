@@ -1,0 +1,97 @@
+from flask import Blueprint, request, jsonify
+from ..models.video import Video
+from ..models.series import Series
+
+discover_bp = Blueprint('discover', __name__)
+
+GENRES = ['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Drama', 'Comedy']
+
+
+@discover_bp.route('/home', methods=['GET'])
+def home():
+    featured_series = (
+        Series.query.filter_by(is_published=True)
+        .order_by(Series.created_at.desc())
+        .first()
+    )
+
+    trending = (
+        Video.query.filter_by(is_published=True)
+        .order_by(Video.view_count.desc())
+        .limit(20)
+        .all()
+    )
+
+    new_episodes = (
+        Video.query.filter_by(is_published=True)
+        .filter(Video.series_id.isnot(None))
+        .order_by(Video.created_at.desc())
+        .limit(20)
+        .all()
+    )
+
+    recently_added = (
+        Video.query.filter_by(is_published=True)
+        .order_by(Video.created_at.desc())
+        .limit(20)
+        .all()
+    )
+
+    featured_series_list = (
+        Series.query.filter_by(is_published=True)
+        .order_by(Series.created_at.desc())
+        .limit(20)
+        .all()
+    )
+
+    genre_rows = {}
+    for genre in GENRES:
+        genre_videos = (
+            Video.query.filter_by(is_published=True, genre=genre)
+            .order_by(Video.view_count.desc())
+            .limit(20)
+            .all()
+        )
+        if genre_videos:
+            genre_rows[genre] = [v.to_dict() for v in genre_videos]
+
+    return jsonify({
+        'featured': featured_series.to_dict() if featured_series else None,
+        'trending': [v.to_dict() for v in trending],
+        'new_episodes': [v.to_dict() for v in new_episodes],
+        'recently_added': [v.to_dict() for v in recently_added],
+        'featured_series': [s.to_dict() for s in featured_series_list],
+        'genres': genre_rows,
+    })
+
+
+@discover_bp.route('/search', methods=['GET'])
+def search():
+    q = request.args.get('q', '').strip()
+    genre = request.args.get('genre', '').strip()
+
+    if not q and not genre:
+        return jsonify({'error': 'Provide q or genre'}), 400
+
+    video_query = Video.query.filter_by(is_published=True)
+    series_query = Series.query.filter_by(is_published=True)
+
+    if q:
+        video_query = video_query.filter(Video.title.ilike(f'%{q}%'))
+        series_query = series_query.filter(Series.title.ilike(f'%{q}%'))
+    if genre:
+        video_query = video_query.filter_by(genre=genre)
+        series_query = series_query.filter_by(genre=genre)
+
+    videos = video_query.order_by(Video.view_count.desc()).limit(24).all()
+    series = series_query.order_by(Series.created_at.desc()).limit(12).all()
+
+    return jsonify({
+        'videos': [v.to_dict() for v in videos],
+        'series': [s.to_dict() for s in series],
+    })
+
+
+@discover_bp.route('/genres', methods=['GET'])
+def genres():
+    return jsonify({'genres': GENRES})

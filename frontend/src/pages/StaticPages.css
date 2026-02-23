@@ -1,0 +1,35 @@
+.static-page { padding-top: 80px; padding-bottom: 80px; }
+.static-inner { max-width: 720px; padding: 40px 24px; }
+.static-title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.static-body { display: flex; flex-direction: column; gap: 16px; }
+.static-body h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-top: 8px;
+}
+.static-body p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+.static-body ul, .static-body ol {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.static-body li { line-height: 1.6; }
+.static-body a { color: var(--cyan); }
+.static-body a:hover { text-decoration: underline; }
+.static-body strong { color: var(--text-primary); }
+.note { font-style: italic; color: var(--text-muted); font-size: 0.85rem !important; }

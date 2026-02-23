@@ -1,0 +1,20 @@
+.h-row {
+  margin-bottom: 40px;
+}
+.h-row__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+.h-row__scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.h-row__scroll::-webkit-scrollbar { height: 4px; }
+.h-row__scroll > * { scroll-snap-align: start; }
