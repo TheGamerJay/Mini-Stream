@@ -5,6 +5,14 @@ const API = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/
 const ADMIN_EMAIL = 'ministream.help@gmail.com'
 const ADMIN_PASS = 'Yariel@13'
 
+function fmtDateTime(iso) {
+  const d = new Date(iso)
+  return d.toLocaleString(undefined, {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+}
+
 function adminFetch(path, token, opts = {}) {
   return fetch(`${API}${path}`, {
     ...opts,
@@ -159,7 +167,7 @@ function OverviewTab({ token }) {
                     {u.is_creator ? 'Creator' : 'Viewer'}
                   </span>
                 </td>
-                <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                <td>{fmtDateTime(u.created_at)}</td>
               </tr>
             ))}
           </tbody>
@@ -242,7 +250,7 @@ function UsersTab({ token }) {
                     </td>
                     <td>{u.video_count}</td>
                     <td>{u.google_id ? 'Google' : 'Email'}</td>
-                    <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                    <td>{fmtDateTime(u.created_at)}</td>
                     <td>
                       <button className="admin-del-btn" onClick={() => deleteUser(u.id)}>
                         Delete
@@ -367,7 +375,7 @@ function VideosTab({ token }) {
                         {v.is_published ? 'Live' : 'Draft'}
                       </span>
                     </td>
-                    <td>{new Date(v.created_at).toLocaleDateString()}</td>
+                    <td>{fmtDateTime(v.created_at)}</td>
                     <td>
                       <button className="admin-del-btn" onClick={() => deleteVideo(v.id)}>
                         Delete
@@ -475,7 +483,7 @@ function SeriesTab({ token }) {
                         {s.is_published ? 'Live' : 'Draft'}
                       </span>
                     </td>
-                    <td>{new Date(s.created_at).toLocaleDateString()}</td>
+                    <td>{fmtDateTime(s.created_at)}</td>
                   </tr>
                 ))}
               </tbody>
