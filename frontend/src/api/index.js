@@ -87,6 +87,14 @@ export const updateVideo = (id, data) => api.put(`/creator/videos/${id}`, data)
 export const deleteVideo = (id) => api.delete(`/creator/videos/${id}`)
 export const getStats = () => api.get('/creator/stats')
 
+// Clip Studio
+export const mergeClips = (formData) =>
+  api.post('/studio/merge', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 600000, // 10 min — merge + Cloudinary upload takes time
+  })
+export const publishMerged = (data) => api.post('/studio/publish', data)
+
 // Reports & Contact
 export const reportVideo = (id, data) => api.post(`/videos/${id}/report`, data)
 export const submitContact = (data) => api.post('/auth/contact', data)

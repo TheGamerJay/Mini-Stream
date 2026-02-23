@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   getStats, getMyVideos, getMySeries,
   uploadVideo, createSeries, updateSeries, updateVideo, deleteVideo,
+  mergeClips, publishMerged,
 } from '../api'
 import './CreatorDashboard.css'
 
@@ -317,6 +318,304 @@ function SeriesTab({ seriesList, onRefresh }) {
   )
 }
 
+function ClipStudioTab({ seriesList, onSuccess }) {
+  const [clips, setClipsState] = useState([])       // [{id, file, name, objUrl}]
+  const clipsRef = useRef([])
+  const setClips = useCallback((fn) => {
+    setClipsState((prev) => {
+      const next = typeof fn === 'function' ? fn(prev) : fn
+      clipsRef.current = next
+      return next
+    })
+  }, [])
+
+  const [previewIdx, setPreviewIdx] = useState(-1)
+  const previewIdxRef = useRef(-1)
+  const videoRef = useRef(null)
+  const fileInputRef = useRef(null)
+
+  const [merging, setMerging] = useState(false)
+  const [mergeError, setMergeError] = useState('')
+  const [mergedUrl, setMergedUrl] = useState('')
+  const [mergedDuration, setMergedDuration] = useState(0)
+
+  const [pf, setPf] = useState({
+    title: '', description: '', genre: GENRES[0], language: LANGUAGES[0],
+    video_type: VIDEO_TYPES[0], content_rating: RATINGS[0],
+    series_id: '', episode_number: '', season_number: '1',
+  })
+  const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState('')
+  const [done, setDone] = useState(false)
+  const setP = (k, v) => setPf((f) => ({ ...f, [k]: v }))
+
+  // Add clips from file input
+  const addFiles = (e) => {
+    const files = Array.from(e.target.files)
+    const newClips = files.map((f) => ({
+      id: Math.random().toString(36).slice(2),
+      file: f, name: f.name,
+      objUrl: URL.createObjectURL(f),
+    }))
+    setClips((prev) => [...prev, ...newClips])
+    e.target.value = ''
+  }
+
+  const removeClip = (id) => {
+    setClips((prev) => {
+      const removed = prev.find((c) => c.id === id)
+      if (removed) URL.revokeObjectURL(removed.objUrl)
+      return prev.filter((c) => c.id !== id)
+    })
+  }
+
+  const moveClip = (idx, dir) => {
+    setClips((prev) => {
+      const next = [...prev]
+      const t = idx + dir
+      if (t < 0 || t >= next.length) return prev
+      ;[next[idx], next[t]] = [next[t], next[idx]]
+      return next
+    })
+  }
+
+  // Sequential DAW-style preview
+  const playAt = useCallback((idx) => {
+    if (!videoRef.current || idx < 0 || idx >= clipsRef.current.length) {
+      previewIdxRef.current = -1
+      setPreviewIdx(-1)
+      return
+    }
+    previewIdxRef.current = idx
+    setPreviewIdx(idx)
+    videoRef.current.src = clipsRef.current[idx].objUrl
+    videoRef.current.play().catch(() => {})
+  }, [])
+
+  const handleEnded = useCallback(() => {
+    playAt(previewIdxRef.current + 1)
+  }, [playAt])
+
+  // Merge
+  const handleMerge = async () => {
+    if (clips.length < 2) { setMergeError('Add at least 2 clips.'); return }
+    setMergeError('')
+    setMerging(true)
+    try {
+      const fd = new FormData()
+      clips.forEach((c) => fd.append('clips', c.file))
+      const { data } = await mergeClips(fd)
+      setMergedUrl(data.video_url)
+      setMergedDuration(data.duration)
+    } catch (err) {
+      setMergeError(err.response?.data?.error || 'Merge failed. Check that all clips are valid MP4 files.')
+    } finally {
+      setMerging(false)
+    }
+  }
+
+  // Publish
+  const handlePublish = async (e) => {
+    e.preventDefault()
+    setPublishError('')
+    setPublishing(true)
+    try {
+      await publishMerged({ ...pf, video_url: mergedUrl, duration: mergedDuration })
+      setDone(true)
+      onSuccess()
+    } catch (err) {
+      setPublishError(err.response?.data?.error || 'Publish failed.')
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const reset = () => {
+    clips.forEach((c) => URL.revokeObjectURL(c.objUrl))
+    setClips([])
+    setMergedUrl('')
+    setMergedDuration(0)
+    setMergeError('')
+    setDone(false)
+    setPf({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1' })
+  }
+
+  if (done) {
+    return (
+      <div className="studio-success">
+        <div className="studio-success-icon">✓</div>
+        <h3>Published!</h3>
+        <p>Your merged video is now live on MiniStream.</p>
+        <button className="btn btn-ghost" onClick={reset}>Start a new merge</button>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h2 className="panel-heading">Clip Studio</h2>
+      <p className="panel-sub">
+        Add your clips, arrange them like a timeline, preview the sequence, merge into one video, then publish.
+      </p>
+
+      {!mergedUrl ? (
+        <>
+          {/* ── Timeline / clip list ── */}
+          <div className="studio-timeline">
+            {clips.length === 0 ? (
+              <div className="studio-empty" onClick={() => fileInputRef.current?.click()}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="2" y="6" width="20" height="12" rx="2" />
+                  <path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none" />
+                </svg>
+                <p>Click to add clips</p>
+                <span>MP4 · WebM · up to {20} clips</span>
+              </div>
+            ) : (
+              <div className="studio-track">
+                {clips.map((c, i) => (
+                  <div key={c.id} className={`studio-clip${previewIdx === i ? ' playing' : ''}`}>
+                    <video className="studio-clip-thumb" src={c.objUrl} preload="metadata" muted />
+                    <div className="studio-clip-info">
+                      <span className="studio-clip-num">{i + 1}</span>
+                      <span className="studio-clip-name" title={c.name}>{c.name.replace(/\.[^.]+$/, '')}</span>
+                    </div>
+                    <div className="studio-clip-btns">
+                      <button className="studio-btn" onClick={() => moveClip(i, -1)} disabled={i === 0} title="Move left">◀</button>
+                      <button className="studio-btn" onClick={() => moveClip(i, 1)} disabled={i === clips.length - 1} title="Move right">▶</button>
+                      <button className="studio-btn studio-btn--remove" onClick={() => removeClip(c.id)} title="Remove">✕</button>
+                    </div>
+                  </div>
+                ))}
+                <button className="studio-add-tile" onClick={() => fileInputRef.current?.click()} title="Add more clips">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  <span>Add</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/mp4,video/webm,video/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={addFiles}
+          />
+
+          {/* ── Preview player ── */}
+          {clips.length > 0 && (
+            <div className="studio-player-wrap">
+              <video
+                ref={videoRef}
+                className="studio-player"
+                controls
+                onEnded={handleEnded}
+              />
+              <div className="studio-player-controls">
+                <button className="btn btn-ghost" onClick={() => playAt(0)}>
+                  ▶ Preview sequence ({clips.length} clips)
+                </button>
+                {previewIdx >= 0 && (
+                  <span className="studio-now-playing">
+                    Now playing clip {previewIdx + 1} / {clips.length}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Merge button ── */}
+          {clips.length >= 2 && (
+            <div className="studio-merge-row">
+              {mergeError && <div className="auth-error" style={{ marginBottom: 12 }}>{mergeError}</div>}
+              <button className="btn btn-primary studio-merge-btn" onClick={handleMerge} disabled={merging}>
+                {merging
+                  ? <><span className="spinner spinner-sm" /> Merging {clips.length} clips… this may take a moment</>
+                  : `⚡ Merge ${clips.length} clips into one video`}
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        /* ── Merged result + publish form ── */
+        <div className="studio-result">
+          <div className="studio-result-header">
+            <span className="studio-result-badge">✓ Merged successfully</span>
+            <button className="btn btn-ghost studio-redo" onClick={() => setMergedUrl('')}>← Re-merge</button>
+          </div>
+
+          <video className="studio-result-video" src={mergedUrl} controls />
+
+          <h3 className="studio-publish-heading">Publish this video</h3>
+          <form onSubmit={handlePublish} className="upload-form">
+            {publishError && <div className="auth-error">{publishError}</div>}
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Title *</label>
+                <input className="form-input" value={pf.title} onChange={(e) => setP('title', e.target.value)} required placeholder="Give your video a title" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Genre *</label>
+                <select className="form-input" value={pf.genre} onChange={(e) => setP('genre', e.target.value)}>
+                  {GENRES.map((g) => <option key={g}>{g}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Language *</label>
+                <select className="form-input" value={pf.language} onChange={(e) => setP('language', e.target.value)}>
+                  {LANGUAGES.map((l) => <option key={l}>{l}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Video Type</label>
+                <select className="form-input" value={pf.video_type} onChange={(e) => { setP('video_type', e.target.value); if (e.target.value !== 'Episode') setP('series_id', '') }}>
+                  {VIDEO_TYPES.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Rating</label>
+                <select className="form-input" value={pf.content_rating} onChange={(e) => setP('content_rating', e.target.value)}>
+                  {RATINGS.map((r) => <option key={r}>{r}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Description *</label>
+              <textarea className="form-input" value={pf.description} onChange={(e) => setP('description', e.target.value)} rows={3} required placeholder="Describe this video…" />
+            </div>
+            {pf.video_type === 'Episode' && (
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Series *</label>
+                  <select className="form-input" value={pf.series_id} onChange={(e) => setP('series_id', e.target.value)} required>
+                    <option value="">— Select a series —</option>
+                    {seriesList.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Season</label>
+                  <input type="number" className="form-input" value={pf.season_number} onChange={(e) => setP('season_number', e.target.value)} min="1" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Episode #</label>
+                  <input type="number" className="form-input" value={pf.episode_number} onChange={(e) => setP('episode_number', e.target.value)} min="1" />
+                </div>
+              </div>
+            )}
+            <button type="submit" className="btn btn-primary" disabled={publishing}>
+              {publishing ? <><span className="spinner spinner-sm" /> Publishing…</> : 'Publish Video'}
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CreatorDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -380,13 +679,19 @@ export default function CreatorDashboard() {
 
         {/* Tabs */}
         <div className="creator-tabs">
-          {['overview', 'upload', 'series', 'manage'].map((t) => (
+          {[
+            ['overview', 'Overview'],
+            ['upload', 'Upload Video'],
+            ['series', 'Create Series'],
+            ['manage', 'Manage Videos'],
+            ['studio', 'Clip Studio'],
+          ].map(([key, label]) => (
             <button
-              key={t}
-              className={`creator-tab${tab === t ? ' active' : ''}`}
-              onClick={() => setTab(t)}
+              key={key}
+              className={`creator-tab${tab === key ? ' active' : ''}`}
+              onClick={() => setTab(key)}
             >
-              {t === 'overview' ? 'Overview' : t === 'upload' ? 'Upload Video' : t === 'series' ? 'Create Series' : 'Manage Videos'}
+              {label}
             </button>
           ))}
         </div>
@@ -426,6 +731,10 @@ export default function CreatorDashboard() {
 
           {tab === 'series' && (
             <SeriesTab seriesList={seriesList} onRefresh={load} />
+          )}
+
+          {tab === 'studio' && (
+            <ClipStudioTab seriesList={seriesList} onSuccess={load} />
           )}
 
           {tab === 'manage' && (

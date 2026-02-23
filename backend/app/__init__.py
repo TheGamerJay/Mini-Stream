@@ -44,6 +44,7 @@ def create_app(config_name=None):
     from .routes.creator import creator_bp
     from .routes.discover import discover_bp
     from .routes.admin import admin_bp
+    from .routes.studio import studio_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(videos_bp, url_prefix='/api/videos')
@@ -51,6 +52,7 @@ def create_app(config_name=None):
     app.register_blueprint(creator_bp, url_prefix='/api/creator')
     app.register_blueprint(discover_bp, url_prefix='/api/discover')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(studio_bp, url_prefix='/api/studio')
 
     @app.route('/api/health')
     def health():

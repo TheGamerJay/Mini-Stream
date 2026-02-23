@@ -10,3 +10,4 @@ cloudinary==1.40.0
 requests==2.32.3
 gunicorn==22.0.0
 resend==2.4.0
+imageio-ffmpeg==0.5.1
