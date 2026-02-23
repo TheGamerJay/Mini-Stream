@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { submitContact } from '../api'
 import './StaticPages.css'
 
 function StaticPage({ title, children }) {
@@ -173,17 +175,91 @@ export function Terms() {
 }
 
 export function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', subject: 'General Inquiry', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
+
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSubmitting(true)
+    try {
+      await submitContact(form)
+      setDone(true)
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Something went wrong. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <StaticPage title="Contact">
-      <p>Have a question or need support? You can reach MiniStream using the contact details below.</p>
-      <h2>General Inquiries</h2>
-      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
-      <h2>DMCA and Copyright</h2>
-      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
-      <h2>Privacy</h2>
-      <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
-      <h2>Response Time</h2>
-      <p>We aim to respond to inquiries within 3 to 5 business days.</p>
+      <p>Have a question, suggestion, or need support? Fill out the form below and we'll get back to you within 3–5 business days.</p>
+
+      {done ? (
+        <div className="contact-success">
+          <div className="contact-success-icon">✓</div>
+          <h3>Message sent!</h3>
+          <p>Thanks for reaching out. We'll get back to you soon.</p>
+        </div>
+      ) : (
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="contact-row">
+            <div className="contact-field">
+              <label>Name</label>
+              <input
+                type="text"
+                placeholder="Your name"
+                value={form.name}
+                onChange={set('name')}
+                required
+                maxLength={100}
+              />
+            </div>
+            <div className="contact-field">
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={form.email}
+                onChange={set('email')}
+                required
+                maxLength={200}
+              />
+            </div>
+          </div>
+          <div className="contact-field">
+            <label>Subject</label>
+            <select value={form.subject} onChange={set('subject')}>
+              <option>General Inquiry</option>
+              <option>Creator Support</option>
+              <option>Bug Report</option>
+              <option>Feature Suggestion</option>
+              <option>DMCA / Copyright</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div className="contact-field">
+            <label>Message</label>
+            <textarea
+              placeholder="Describe your question or feedback…"
+              value={form.message}
+              onChange={set('message')}
+              required
+              rows={6}
+              maxLength={2000}
+            />
+          </div>
+          {error && <p className="contact-error">{error}</p>}
+          <button type="submit" className="btn btn-primary contact-submit" disabled={submitting}>
+            {submitting ? 'Sending…' : 'Send Message'}
+          </button>
+        </form>
+      )}
     </StaticPage>
   )
 }

@@ -182,6 +182,52 @@ def become_creator():
         return jsonify({'error': 'User not found'}), 404
     user.is_creator = True
     db.session.commit()
+
+    from_addr = os.environ.get('RESEND_FROM', 'MiniStream <noreply@ministream.online>')
+    base_url = os.environ.get('FRONTEND_URL', 'https://ministream.online')
+
+    # Notify admin
+    try:
+        resend.Emails.send({
+            'from': from_addr,
+            'to': ['ministream.help@gmail.com'],
+            'subject': f'New Creator: {user.display_name}',
+            'html': f'''
+                <div style="font-family:sans-serif;max-width:480px;padding:24px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                    <h2 style="color:#00d4ff;">New Creator Activated</h2>
+                    <p><strong>{user.display_name}</strong> just activated their Creator account.</p>
+                    <p>Email: {user.email}</p>
+                    <p>User ID: {user.id}</p>
+                </div>
+            ''',
+        })
+    except Exception as e:
+        logger.error('Creator admin alert failed: %s', e)
+
+    # Welcome the new creator
+    try:
+        resend.Emails.send({
+            'from': from_addr,
+            'to': [user.email],
+            'subject': "You're now a MiniStream Creator!",
+            'html': f'''
+                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                    <div style="text-align:center;margin-bottom:24px;">
+                        <img src="{base_url}/Mini%20Stream%20logo.png" alt="MiniStream" style="height:72px;width:auto;" />
+                    </div>
+                    <h2 style="color:#00d4ff;margin-bottom:8px;">Creator account activated, {user.display_name}!</h2>
+                    <p style="color:#a0a0b0;">Your MiniStream Creator account is live. You can now upload videos, create series, and share your original stories with the world.</p>
+                    <div style="text-align:center;margin:28px 0;">
+                        <a href="{base_url}/creator" style="display:inline-block;padding:12px 32px;background:#00d4ff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;">Go to Creator Dashboard</a>
+                    </div>
+                    <hr style="border:none;border-top:1px solid #1e1e2e;margin:24px 0;" />
+                    <p style="color:#606070;font-size:12px;text-align:center;">MiniStream · Original stories. Indie creators. No noise.</p>
+                </div>
+            ''',
+        })
+    except Exception as e:
+        logger.error('Creator welcome email failed for %s: %s', user.email, e)
+
     return jsonify({'user': user.to_dict()})
 
 
@@ -271,3 +317,38 @@ def reset_password():
     db.session.commit()
 
     return jsonify({'message': 'Password updated successfully'})
+
+
+@auth_bp.route('/contact', methods=['POST'])
+def contact():
+    data = request.get_json() or {}
+    name = data.get('name', '').strip()[:100]
+    email_from = data.get('email', '').strip()[:200]
+    subject = data.get('subject', 'General Inquiry').strip()[:100]
+    message = data.get('message', '').strip()[:2000]
+
+    if not name or not email_from or not message:
+        return jsonify({'error': 'Name, email, and message are required'}), 400
+
+    from_addr = os.environ.get('RESEND_FROM', 'MiniStream <noreply@ministream.online>')
+    try:
+        resend.Emails.send({
+            'from': from_addr,
+            'reply_to': email_from,
+            'to': ['ministream.help@gmail.com'],
+            'subject': f'[Contact] {subject} — {name}',
+            'html': f'''
+                <div style="font-family:sans-serif;max-width:480px;padding:24px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                    <h2 style="color:#00d4ff;">New Contact Message</h2>
+                    <p><strong>From:</strong> {name} &lt;{email_from}&gt;</p>
+                    <p><strong>Subject:</strong> {subject}</p>
+                    <hr style="border:none;border-top:1px solid #1e1e2e;margin:16px 0;" />
+                    <p style="white-space:pre-wrap;color:#a0a0b0;">{message}</p>
+                </div>
+            ''',
+        })
+    except Exception as e:
+        logger.error('Contact email failed: %s', e)
+        return jsonify({'error': 'Failed to send message. Please try again.'}), 500
+
+    return jsonify({'message': 'Message sent! We\'ll get back to you within 3–5 business days.'})

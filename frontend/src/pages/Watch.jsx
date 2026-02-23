@@ -1,9 +1,18 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus } from '../api'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo } from '../api'
 import { useAuth } from '../context/AuthContext'
 import VideoCard from '../components/VideoCard'
 import './Watch.css'
+
+const REPORT_REASONS = [
+  'Spam or misleading',
+  'Hate speech or harassment',
+  'Violence or graphic content',
+  'Copyright infringement',
+  'Inappropriate for rating',
+  'Other',
+]
 
 export default function Watch() {
   const { id } = useParams()
@@ -14,6 +23,13 @@ export default function Watch() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [seriesEpisodes, setSeriesEpisodes] = useState([])
+
+  // Report modal state
+  const [reportOpen, setReportOpen] = useState(false)
+  const [reportReason, setReportReason] = useState(REPORT_REASONS[0])
+  const [reportNotes, setReportNotes] = useState('')
+  const [reportSubmitting, setReportSubmitting] = useState(false)
+  const [reportDone, setReportDone] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -45,6 +61,24 @@ export default function Watch() {
     } catch { /* ignore */ } finally {
       setSaving(false)
     }
+  }
+
+  const submitReport = async (e) => {
+    e.preventDefault()
+    setReportSubmitting(true)
+    try {
+      await reportVideo(id, { reason: reportReason, notes: reportNotes })
+      setReportDone(true)
+    } catch { /* ignore */ } finally {
+      setReportSubmitting(false)
+    }
+  }
+
+  const closeReport = () => {
+    setReportOpen(false)
+    setReportDone(false)
+    setReportReason(REPORT_REASONS[0])
+    setReportNotes('')
   }
 
   if (loading) return <div className="page-loader"><div className="spinner" /></div>
@@ -80,7 +114,10 @@ export default function Watch() {
 
           <div className="watch-meta">
             {video.creator_name && (
-              <span className="watch-creator">By {video.creator_name}</span>
+              <span className="watch-creator">
+                By {video.creator_name}
+                <span className="watch-creator-badge">✦ Creator</span>
+              </span>
             )}
             {video.series_title && (
               <Link to={`/series/${video.series_id}`} className="watch-series-link">
@@ -91,25 +128,30 @@ export default function Watch() {
             <span>{Number(video.view_count).toLocaleString()} views</span>
           </div>
 
-          {user && (
-            <button
-              className={`btn watch-save-btn ${saved ? 'btn-outline-cyan' : 'btn-ghost'}`}
-              onClick={toggleSave}
-              disabled={saving}
-            >
-              {saved ? (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" /></svg>
-                  Saved
-                </>
-              ) : (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" /></svg>
-                  Save to Watch Later
-                </>
-              )}
+          <div className="watch-actions">
+            {user && (
+              <button
+                className={`btn watch-save-btn ${saved ? 'btn-outline-cyan' : 'btn-ghost'}`}
+                onClick={toggleSave}
+                disabled={saving}
+              >
+                {saved ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" /></svg>
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" /></svg>
+                    Save to Watch Later
+                  </>
+                )}
+              </button>
+            )}
+            <button className="btn watch-report-btn" onClick={() => setReportOpen(true)}>
+              Report
             </button>
-          )}
+          </div>
 
           {video.description && (
             <div className="watch-description">
@@ -129,6 +171,59 @@ export default function Watch() {
           </div>
         )}
       </div>
+
+      {/* Report modal */}
+      {reportOpen && (
+        <div className="report-overlay" onClick={closeReport}>
+          <div className="report-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="report-close" onClick={closeReport}>✕</button>
+            {reportDone ? (
+              <div className="report-done">
+                <div className="report-done-icon">✓</div>
+                <h3>Report submitted</h3>
+                <p>Thanks for helping keep MiniStream safe. We'll review this content.</p>
+                <button className="btn btn-ghost" onClick={closeReport}>Close</button>
+              </div>
+            ) : (
+              <>
+                <h3 className="report-title">Report this video</h3>
+                <p className="report-sub">Help us understand the issue</p>
+                <form onSubmit={submitReport}>
+                  <div className="report-reasons">
+                    {REPORT_REASONS.map((r) => (
+                      <label key={r} className={`report-reason ${reportReason === r ? 'selected' : ''}`}>
+                        <input
+                          type="radio"
+                          name="reason"
+                          value={r}
+                          checked={reportReason === r}
+                          onChange={() => setReportReason(r)}
+                        />
+                        {r}
+                      </label>
+                    ))}
+                  </div>
+                  <textarea
+                    className="report-notes"
+                    placeholder="Additional details (optional)"
+                    value={reportNotes}
+                    onChange={(e) => setReportNotes(e.target.value)}
+                    rows={3}
+                    maxLength={500}
+                  />
+                  <button
+                    type="submit"
+                    className="btn report-submit-btn"
+                    disabled={reportSubmitting}
+                  >
+                    {reportSubmitting ? 'Submitting…' : 'Submit Report'}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

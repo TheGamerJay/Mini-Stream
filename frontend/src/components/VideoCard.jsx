@@ -35,7 +35,12 @@ export default function VideoCard({ item, type = 'video' }) {
       <div className="video-card__info">
         <h3 className="video-card__title">{item.title}</h3>
         <div className="video-card__meta">
-          {item.creator_name && <span>{item.creator_name}</span>}
+          {item.creator_name && (
+            <span className="video-card__creator-wrap">
+              {item.creator_name}
+              <span className="creator-badge">✦ Creator</span>
+            </span>
+          )}
           {item.genre && <span className="dot">·</span>}
           {item.genre && <span>{item.genre}</span>}
         </div>

@@ -110,6 +110,22 @@
   flex-wrap: wrap;
 }
 .dot { color: var(--text-muted); }
+.video-card__creator-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.creator-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--cyan);
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,212,255,0.25);
+  border-radius: 99px;
+  padding: 1px 6px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
 .video-card__series {
   font-size: 0.75rem;
   color: var(--cyan);

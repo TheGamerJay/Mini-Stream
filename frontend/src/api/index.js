@@ -86,4 +86,8 @@ export const updateVideo = (id, data) => api.put(`/creator/videos/${id}`, data)
 export const deleteVideo = (id) => api.delete(`/creator/videos/${id}`)
 export const getStats = () => api.get('/creator/stats')
 
+// Reports & Contact
+export const reportVideo = (id, data) => api.post(`/videos/${id}/report`, data)
+export const submitContact = (data) => api.post('/auth/contact', data)
+
 export default api
