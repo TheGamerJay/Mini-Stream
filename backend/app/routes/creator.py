@@ -37,6 +37,8 @@ def upload_video():
     description = request.form.get('description', '').strip()
     genre = request.form.get('genre', '').strip()
     language = request.form.get('language', 'English').strip()
+    video_type = request.form.get('video_type', 'Standalone').strip()
+    content_rating = request.form.get('content_rating', 'General').strip()
     series_id = request.form.get('series_id', type=int)
     episode_number = request.form.get('episode_number', type=int)
     season_number = request.form.get('season_number', 1, type=int)
@@ -76,6 +78,8 @@ def upload_video():
         description=description,
         genre=genre,
         language=language,
+        video_type=video_type,
+        content_rating=content_rating,
         video_url=video_result['secure_url'],
         thumbnail_url=thumbnail_url,
         cloudinary_public_id=video_result['public_id'],
@@ -102,6 +106,7 @@ def create_series():
         description=data.get('description', '').strip(),
         genre=data['genre'],
         language=data.get('language', 'English'),
+        content_rating=data.get('content_rating', 'General'),
         banner_url=data.get('banner_url'),
         thumbnail_url=data.get('thumbnail_url'),
     )

@@ -20,6 +20,7 @@ class Series(db.Model):
     description = db.Column(db.Text, nullable=True)
     genre = db.Column(db.String(50), nullable=False)
     language = db.Column(db.String(50), nullable=False, default='English')
+    content_rating = db.Column(db.String(20), nullable=False, default='General')
     banner_url = db.Column(db.String(500), nullable=True)
     thumbnail_url = db.Column(db.String(500), nullable=True)
     is_published = db.Column(db.Boolean, default=True, nullable=False)
@@ -46,6 +47,7 @@ class Series(db.Model):
             'description': self.description,
             'genre': self.genre,
             'language': self.language,
+            'content_rating': self.content_rating,
             'banner_url': self.banner_url,
             'thumbnail_url': self.thumbnail_url,
             'episode_count': self.episodes.count(),

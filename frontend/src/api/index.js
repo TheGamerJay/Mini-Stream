@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Auto-refresh on 401
+// Auto-refresh on 401; clear bad tokens on 422
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -33,6 +33,11 @@ api.interceptors.response.use(
           localStorage.removeItem('refresh_token')
         }
       }
+    }
+    // 422 = token unprocessable (corrupted/wrong format) — clear and force re-login
+    if (error.response?.status === 422) {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
     }
     return Promise.reject(error)
   }
