@@ -42,6 +42,35 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
+    from_addr = os.environ.get('RESEND_FROM', 'MiniStream <noreply@ministream.com>')
+    reply_to = os.environ.get('RESEND_REPLY_TO', 'ministream.help@gmail.com')
+    base_url = os.environ.get('FRONTEND_URL', 'https://mini-stream-production.up.railway.app')
+    try:
+        resend.Emails.send({
+            'from': from_addr,
+            'reply_to': reply_to,
+            'to': [email],
+            'subject': 'Welcome to MiniStream!',
+            'html': f'''
+                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                    <div style="text-align:center;margin-bottom:24px;">
+                        <img src="{base_url}/Mini Stream logo.png" alt="MiniStream" style="height:72px;width:auto;" />
+                    </div>
+                    <h2 style="color:#00d4ff;margin-bottom:8px;">Welcome, {display_name}!</h2>
+                    <p style="color:#a0a0b0;">You&apos;re officially part of MiniStream — the home of original stories and indie creators.</p>
+                    <p style="color:#a0a0b0;">Start exploring content from creators around the world, or apply to become a creator yourself and share your story.</p>
+                    <div style="text-align:center;margin:28px 0;">
+                        <a href="{base_url}/home" style="display:inline-block;padding:12px 32px;background:#00d4ff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;margin-right:12px;">Browse Content</a>
+                        <a href="{base_url}/become-creator" style="display:inline-block;padding:12px 32px;background:transparent;color:#00d4ff;border:2px solid #00d4ff;border-radius:8px;text-decoration:none;font-weight:700;">Become a Creator</a>
+                    </div>
+                    <hr style="border:none;border-top:1px solid #1e1e2e;margin:24px 0;" />
+                    <p style="color:#606070;font-size:12px;text-align:center;">MiniStream · Original stories. Indie creators. No noise.</p>
+                </div>
+            ''',
+        })
+    except Exception:
+        pass
+
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
     return jsonify({
