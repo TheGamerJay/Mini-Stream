@@ -83,9 +83,6 @@ export default function Landing() {
               Upload original videos and series. Reach viewers who care about
               indie storytelling. No algorithm manipulation — just great content.
             </p>
-            <div className="creator-cta__actions">
-              <Link to="/how-it-works" className="btn btn-primary">How It Works</Link>
-            </div>
           </div>
         </div>
       </section>
