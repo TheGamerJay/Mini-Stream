@@ -74,7 +74,9 @@ export function ContentRules() {
         <li>Real-world violence or gore</li>
       </ul>
       <h2>Enforcement</h2>
-      <p>MiniStream does not actively pre-screen uploads but will remove content that violates these rules. Creators are fully responsible for the content they upload. Repeated violations will result in account termination.</p>
+      <p>MiniStream does not actively pre-screen user uploads. However, MiniStream reserves the right to review, remove, or restrict access to any content that violates these rules or applicable laws.</p>
+      <p>Creators are solely responsible for the content they upload. Repeated or serious violations may result in account suspension or permanent termination.</p>
+      <p>MiniStream reserves the right, at its sole discretion, to remove content or limit access to the platform for material that is unlawful, harmful, abusive, or otherwise inconsistent with the purpose and standards of the platform.</p>
       <h2>DMCA</h2>
       <p>To report copyright infringement, please visit our <Link to="/dmca">DMCA page</Link>.</p>
     </StaticPage>
