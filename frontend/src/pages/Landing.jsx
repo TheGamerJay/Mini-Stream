@@ -85,7 +85,6 @@ export default function Landing() {
             </p>
             <div className="creator-cta__actions">
               <Link to="/how-it-works" className="btn btn-primary">How It Works</Link>
-              <Link to="/signup" className="btn btn-ghost">Sign Up Free</Link>
             </div>
           </div>
         </div>
