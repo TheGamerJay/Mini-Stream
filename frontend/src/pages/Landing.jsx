@@ -40,7 +40,6 @@ export default function Landing() {
           </p>
           <div className="landing-hero__actions">
             <Link to="/home" className="btn btn-primary landing-cta">Start Watching</Link>
-            <Link to="/signup" className="btn btn-ghost">Create Account</Link>
           </div>
         </div>
         <div className="landing-hero__preview">
