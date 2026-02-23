@@ -65,6 +65,10 @@ export const getWatchLater = () => api.get('/videos/watch-later')
 export const addWatchLater = (id) => api.post(`/videos/${id}/watch-later`)
 export const removeWatchLater = (id) => api.delete(`/videos/${id}/watch-later`)
 export const getWatchLaterStatus = (id) => api.get(`/videos/${id}/watch-later/status`)
+export const saveProgress = (id, seconds) => api.post(`/videos/${id}/progress`, { seconds })
+export const getVideoProgress = (id) => api.get(`/videos/${id}/progress`)
+export const getContinueWatching = () => api.get('/videos/continue-watching')
+export const getHistory = () => api.get('/videos/history')
 
 // Series
 export const getSeries = (id) => api.get(`/series/${id}`)

@@ -28,6 +28,11 @@ export default function VideoCard({ item, type = 'video' }) {
         {item.content_rating && (
           <span className="video-card__rating">{item.content_rating}</span>
         )}
+        {isVideo && item.progress_pct > 0 && item.progress_pct < 100 && (
+          <div className="video-card__progress">
+            <div className="video-card__progress-fill" style={{ width: `${item.progress_pct}%` }} />
+          </div>
+        )}
         {item.duration_formatted && (
           <span className="video-card__duration">{item.duration_formatted}</span>
         )}

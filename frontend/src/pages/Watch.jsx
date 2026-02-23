@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo } from '../api'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress } from '../api'
 import { useAuth } from '../context/AuthContext'
 import VideoCard from '../components/VideoCard'
 import './Watch.css'
@@ -24,6 +24,10 @@ export default function Watch() {
   const [saving, setSaving] = useState(false)
   const [seriesEpisodes, setSeriesEpisodes] = useState([])
 
+  const videoRef = useRef(null)
+  const progressIntervalRef = useRef(null)
+  const savedSecondsRef = useRef(0)
+
   // Report modal state
   const [reportOpen, setReportOpen] = useState(false)
   const [reportReason, setReportReason] = useState(REPORT_REASONS[0])
@@ -34,18 +38,51 @@ export default function Watch() {
   useEffect(() => {
     setLoading(true)
     setError('')
+    savedSecondsRef.current = 0
     getVideo(id)
       .then(({ data }) => {
         setVideo(data.video)
-        if (data.video.series_id && user) {
-          return getWatchLaterStatus(id)
-            .then(({ data: s }) => setSaved(s.saved))
-            .catch(() => {})
+        if (user) {
+          getWatchLaterStatus(id).then(({ data: s }) => setSaved(s.saved)).catch(() => {})
+          getVideoProgress(id).then(({ data: p }) => { savedSecondsRef.current = p.seconds || 0 }).catch(() => {})
         }
       })
       .catch(() => setError('Video not found or unavailable.'))
       .finally(() => setLoading(false))
   }, [id, user])
+
+  // Save progress on unmount or video id change
+  useEffect(() => {
+    return () => {
+      clearInterval(progressIntervalRef.current)
+      if (videoRef.current) {
+        const seconds = Math.floor(videoRef.current.currentTime)
+        if (seconds > 0) saveProgress(id, seconds).catch(() => {})
+      }
+    }
+  }, [id])
+
+  const handleLoadedMetadata = () => {
+    if (savedSecondsRef.current > 5 && videoRef.current) {
+      videoRef.current.currentTime = savedSecondsRef.current
+    }
+  }
+
+  const handlePlay = () => {
+    clearInterval(progressIntervalRef.current)
+    progressIntervalRef.current = setInterval(() => {
+      if (!videoRef.current) return
+      const seconds = Math.floor(videoRef.current.currentTime)
+      if (seconds > 0) saveProgress(id, seconds).catch(() => {})
+    }, 30000)
+  }
+
+  const handlePause = () => {
+    clearInterval(progressIntervalRef.current)
+    if (!videoRef.current) return
+    const seconds = Math.floor(videoRef.current.currentTime)
+    if (seconds > 0) saveProgress(id, seconds).catch(() => {})
+  }
 
   const toggleSave = async () => {
     if (!user || saving) return
@@ -89,11 +126,15 @@ export default function Watch() {
     <div className="watch-page">
       <div className="watch-player-wrap">
         <video
+          ref={videoRef}
           className="watch-player"
           src={video.video_url}
           controls
           autoPlay={false}
           poster={video.thumbnail_url || undefined}
+          onLoadedMetadata={handleLoadedMetadata}
+          onPlay={handlePlay}
+          onPause={handlePause}
         />
       </div>
 

@@ -4,7 +4,7 @@ import HeroBanner from '../components/HeroBanner'
 import HorizontalRow from '../components/HorizontalRow'
 import VideoCard from '../components/VideoCard'
 import { useAuth } from '../context/AuthContext'
-import { getHomeData, browseVideos } from '../api'
+import { getHomeData, browseVideos, getContinueWatching } from '../api'
 import './Home.css'
 
 const GENRES = [
@@ -26,6 +26,8 @@ export default function Home() {
   const [q, setQ] = useState(searchParams.get('q') || '')
   const [submittedQ, setSubmittedQ] = useState(searchParams.get('q') || '')
 
+  const [continueWatching, setContinueWatching] = useState([])
+
   // Browse grid
   const [videos, setVideos] = useState([])
   const [page, setPage] = useState(1)
@@ -41,6 +43,14 @@ export default function Home() {
       .catch(console.error)
       .finally(() => setLoadingHome(false))
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      getContinueWatching()
+        .then(({ data }) => setContinueWatching(data.continue_watching))
+        .catch(() => {})
+    }
+  }, [user])
 
   const fetchBrowse = useCallback(async (p, genre, rating, query) => {
     setLoadingBrowse(true)
@@ -211,6 +221,9 @@ export default function Home() {
         ) : (
           /* Default → curated horizontal rows */
           <div className="home-rows fade-in">
+            {continueWatching.length > 0 && (
+              <HorizontalRow title="Continue Watching" items={continueWatching} type="video" />
+            )}
             <HorizontalRow title="Trending Now" items={homeData?.trending} type="video" />
             <HorizontalRow title="New Episodes" items={homeData?.new_episodes} type="video" />
             <HorizontalRow title="Featured Series" items={homeData?.featured_series} type="series" />

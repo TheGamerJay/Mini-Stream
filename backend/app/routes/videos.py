@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_req
 from .. import db
 from ..models.video import Video
 from ..models.watch_later import WatchLater
+from ..models.watch_history import WatchHistory
 
 logger = logging.getLogger(__name__)
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
@@ -77,6 +78,72 @@ def watch_later_status(video_id):
     user_id = int(get_jwt_identity())
     saved = WatchLater.query.filter_by(user_id=user_id, video_id=video_id).first() is not None
     return jsonify({'saved': saved})
+
+
+@videos_bp.route('/<int:video_id>/progress', methods=['POST'])
+@jwt_required()
+def save_progress(video_id):
+    user_id = int(get_jwt_identity())
+    Video.query.get_or_404(video_id)
+    data = request.get_json() or {}
+    seconds = int(data.get('seconds', 0))
+
+    entry = WatchHistory.query.filter_by(user_id=user_id, video_id=video_id).first()
+    if entry:
+        entry.progress_seconds = seconds
+        entry.last_watched_at = db.func.now()
+    else:
+        entry = WatchHistory(user_id=user_id, video_id=video_id, progress_seconds=seconds)
+        db.session.add(entry)
+    db.session.commit()
+    return jsonify({'saved': True})
+
+
+@videos_bp.route('/history', methods=['GET'])
+@jwt_required()
+def get_history():
+    user_id = int(get_jwt_identity())
+    items = (
+        WatchHistory.query.filter_by(user_id=user_id)
+        .order_by(WatchHistory.last_watched_at.desc())
+        .limit(50)
+        .all()
+    )
+    return jsonify({'history': [item.to_dict() for item in items if item.to_dict()]})
+
+
+@videos_bp.route('/continue-watching', methods=['GET'])
+@jwt_required()
+def continue_watching():
+    user_id = int(get_jwt_identity())
+    # Videos with progress between 5% and 95%
+    items = (
+        WatchHistory.query
+        .join(Video, WatchHistory.video_id == Video.id)
+        .filter(
+            WatchHistory.user_id == user_id,
+            Video.is_published == True,
+            Video.duration > 0,
+            WatchHistory.progress_seconds > 0,
+        )
+        .order_by(WatchHistory.last_watched_at.desc())
+        .limit(20)
+        .all()
+    )
+    results = []
+    for item in items:
+        d = item.to_dict()
+        if d and 5 <= d.get('progress_pct', 0) <= 95:
+            results.append(d)
+    return jsonify({'continue_watching': results})
+
+
+@videos_bp.route('/<int:video_id>/progress', methods=['GET'])
+@jwt_required()
+def get_progress(video_id):
+    user_id = int(get_jwt_identity())
+    entry = WatchHistory.query.filter_by(user_id=user_id, video_id=video_id).first()
+    return jsonify({'seconds': entry.progress_seconds if entry else 0})
 
 
 @videos_bp.route('/<int:video_id>/report', methods=['POST'])

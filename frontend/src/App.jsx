@@ -12,6 +12,7 @@ import Watch from './pages/Watch'
 import SeriesPage from './pages/SeriesPage'
 import CreatorDashboard from './pages/CreatorDashboard'
 import WatchLater from './pages/WatchLater'
+import WatchHistory from './pages/WatchHistory'
 import BecomeCreator from './pages/BecomeCreator'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
@@ -60,6 +61,7 @@ function AppRoutes() {
           <Route path="/watch/:id" element={<PrivateRoute><Watch /></PrivateRoute>} />
           <Route path="/series/:id" element={<PrivateRoute><SeriesPage /></PrivateRoute>} />
           <Route path="/watch-later" element={<PrivateRoute><WatchLater /></PrivateRoute>} />
+          <Route path="/history" element={<PrivateRoute><WatchHistory /></PrivateRoute>} />
           <Route path="/become-creator" element={<PrivateRoute><BecomeCreator /></PrivateRoute>} />
           <Route path="/creator" element={<PrivateRoute><CreatorDashboard /></PrivateRoute>} />
           <Route path="/about" element={<About />} />

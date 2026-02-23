@@ -35,6 +35,9 @@ class Video(db.Model):
     watch_later_entries = db.relationship(
         'WatchLater', backref='video', lazy='dynamic'
     )
+    watch_history_entries = db.relationship(
+        'WatchHistory', backref='video', lazy='dynamic'
+    )
 
     def format_duration(self):
         if not self.duration:

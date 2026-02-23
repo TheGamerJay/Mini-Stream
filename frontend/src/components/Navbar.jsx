@@ -40,6 +40,7 @@ export default function Navbar() {
           <nav className="navbar__nav">
             <NavLink to="/home" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Stream</NavLink>
             <NavLink to="/watch-later" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Watch Later</NavLink>
+            <NavLink to="/history" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>History</NavLink>
             {user.is_creator && (
               <NavLink to="/creator" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Dashboard</NavLink>
             )}
@@ -101,6 +102,9 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/watch-later" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
             Watch Later
+          </NavLink>
+          <NavLink to="/history" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
+            History
           </NavLink>
           {user.is_creator && (
             <NavLink to="/creator" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
