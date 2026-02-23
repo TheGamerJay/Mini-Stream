@@ -202,14 +202,16 @@ _DEMO_EMAILS = [
 ]
 
 _DEMO_VIDS = [
+    # Blender open short films (animated, royalty-free)
     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+    # Mixkit 3D/animation clips (royalty-free, no auth needed)
+    'https://assets.mixkit.co/videos/31549/31549-720.mp4',   # flying into a black hole
+    'https://assets.mixkit.co/videos/14540/14540-720.mp4',   # flying across rocky planet
+    'https://assets.mixkit.co/videos/32941/32941-720.mp4',   # exploring flowery gardens
+    'https://assets.mixkit.co/videos/34041/34041-720.mp4',   # man on mountain at sunset
+    'https://assets.mixkit.co/videos/18052/18052-720.mp4',   # particle explosion / fire
+    'https://assets.mixkit.co/videos/32953/32953-720.mp4',   # dark creepy graveyard
 ]
 
 def _thumb(seed):
@@ -274,25 +276,43 @@ _DEMO_SERIES = [
     },
 ]
 
+# Standalone entries: (creator_index, title, genre, description, rating, video_url_or_None)
+# video_url_or_None = None  →  uses rotating _vurl(i) placeholder
+# video_url_or_None = URL   →  uses that specific video (real public-domain anime from archive.org)
 _STANDALONE = [
-    (0, 'The Watcher (Short Film)', 'Horror', 'A lone security guard discovers something is watching him through the cameras.', 'Mature'),
-    (0, 'Bloom — An Animated Short', 'Experimental', 'A wordless meditation on growth, loss, and returning home.', 'General'),
-    (1, 'Midnight Ramen', 'Slice of Life', 'A chef finds unexpected company in his empty restaurant at 2AM.', 'General'),
-    (1, 'Steel and Sky', 'Action', 'A ronin takes a final job that forces her to face her past.', 'Mature'),
-    (2, 'Orbit', 'Sci-Fi', 'Two astronauts stranded in orbit must decide who comes home.', 'General'),
-    (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'General'),
-    (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'General'),
-    (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'General'),
-    # Anime, Isekai, Seinen, Shojo, Shonen
-    (0, 'Sakura Protocol', 'Anime', 'A student council president discovers her school is a front for an ancient order of warriors.', 'General'),
-    (1, 'Another World, Same Me', 'Isekai', 'A burned-out office worker reincarnates into a fantasy world — and immediately wants to retire again.', 'General'),
-    (2, 'Under the Overpass', 'Seinen', 'A retired hitman runs a late-night convenience store and tries very hard not to get involved in things.', 'Mature'),
-    (0, 'Letters in Lavender', 'Shojo', 'Two childhood friends separated for six years start exchanging handwritten letters without knowing each other\'s new identities.', 'General'),
-    (1, 'Iron Bracket', 'Shonen', 'A middle schooler with zero talent enters the national arm-wrestling circuit on a dare and refuses to lose.', 'General'),
-    (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'Mature'),
-    (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'Mature'),
-    (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'General'),
-    (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'General'),
+    (0, 'The Watcher (Short Film)', 'Horror', 'A lone security guard discovers something is watching him through the cameras.', 'Mature', None),
+    (0, 'Bloom — An Animated Short', 'Experimental', 'A wordless meditation on growth, loss, and returning home.', 'General', None),
+    (1, 'Midnight Ramen', 'Slice of Life', 'A chef finds unexpected company in his empty restaurant at 2AM.', 'General', None),
+    (1, 'Steel and Sky', 'Action', 'A ronin takes a final job that forces her to face her past.', 'Mature', None),
+    (2, 'Orbit', 'Sci-Fi', 'Two astronauts stranded in orbit must decide who comes home.', 'General', None),
+    (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'General', None),
+    (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'General', None),
+    (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'General', None),
+    # Real public-domain anime from Internet Archive
+    (0, 'Speed Racer — The Great Plan Pt. 1', 'Anime',
+     'Mach 5 driver Go Mifune competes in the most dangerous race of his life. Classic 1967 anime.',
+     'General',
+     'https://archive.org/download/speed-racer-episode-03/Speed%20Racer%20Episode%2001.mp4'),
+    (1, 'Gigantor — The Plot to Steal the Sun', 'Isekai',
+     'A boy and his giant robot are humanity\'s last defence against a power-hungry villain. 1993 anime.',
+     'General',
+     'https://archive.org/download/the-new-adventures-of-gigantor/The%20New%20Adventures%20of%20Gigantor%2001%20-%20The%20Plot%20to%20Steal%20the%20Sun.mp4'),
+    (2, '8th Man — Pilot', 'Seinen',
+     'A detective is killed in the line of duty and resurrected as a cybernetic superhero. Dark 1960s anime.',
+     'Mature',
+     'https://archive.org/download/tobor-the-8th-man/Ep1-Pilot.mp4'),
+    (0, 'Jungle Emperor — Episode 1', 'Shojo',
+     'Kimba the white lion cub journeys from Africa to Japan in search of his destiny. Tezuka\'s classic 1965 anime.',
+     'General',
+     'https://archive.org/download/jungletaitei/Jungle%20Taitei%20(1965)%20-%2001%20%5B1080p%5D.mp4'),
+    (1, 'Speed Racer — The New Adventures Ep. 1', 'Shonen',
+     'Go Mifune returns in an all-new high-speed adventure. 1993 revival series.',
+     'General',
+     'https://archive.org/download/new-adventures-of-speed-racer/The%20New%20Adventures%20of%20Speed%20Racer%20E01%20-%20The%20Mach-5s%20First%20Trial.mp4'),
+    (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'Mature', None),
+    (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'Mature', None),
+    (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'General', None),
+    (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'General', None),
 ]
 
 
@@ -336,12 +356,12 @@ def seed_demo():
             ))
             vi += 1
 
-    for i, (ci, title, genre, desc, rating) in enumerate(_STANDALONE):
+    for i, (ci, title, genre, desc, rating, specific_url) in enumerate(_STANDALONE):
         c = creators[ci]
         db.session.add(Video(
             creator_id=c.id, title=title, description=desc,
             genre=genre, language='English', video_type='Standalone',
-            content_rating=rating, video_url=_vurl(vi),
+            content_rating=rating, video_url=specific_url or _vurl(vi),
             thumbnail_url=_thumb(f"solo{i}"),
             duration=600 + i * 120, view_count=80 + i * 53,
             is_published=True,

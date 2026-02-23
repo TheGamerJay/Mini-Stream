@@ -38,8 +38,7 @@ export default function Navbar() {
 
         {user && (
           <nav className="navbar__nav">
-            <NavLink to="/home" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Discover</NavLink>
-            <NavLink to="/browse" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Browse</NavLink>
+            <NavLink to="/home" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Stream</NavLink>
             <NavLink to="/watch-later" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Watch Later</NavLink>
             {user.is_creator && (
               <NavLink to="/creator" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Dashboard</NavLink>
@@ -98,10 +97,7 @@ export default function Navbar() {
       {mobileOpen && user && (
         <div className="mobile-drawer">
           <NavLink to="/home" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
-            Discover
-          </NavLink>
-          <NavLink to="/browse" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
-            Browse
+            Stream
           </NavLink>
           <NavLink to="/watch-later" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
             Watch Later
