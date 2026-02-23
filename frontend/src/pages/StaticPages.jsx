@@ -162,14 +162,15 @@ export function Terms() {
 export function Contact() {
   return (
     <StaticPage title="Contact">
-      <p>Have a question or need support? Reach out to us below.</p>
+      <p>Have a question or need support? You can reach MiniStream using the contact details below.</p>
       <h2>General Inquiries</h2>
       <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
-      <h2>DMCA / Copyright</h2>
+      <h2>DMCA and Copyright</h2>
       <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
       <h2>Privacy</h2>
       <p>Email: <a href="mailto:ministream.help@gmail.com">ministream.help@gmail.com</a></p>
-      <p className="note">We aim to respond within 3–5 business days.</p>
+      <h2>Response Time</h2>
+      <p>We aim to respond to inquiries within 3 to 5 business days.</p>
     </StaticPage>
   )
 }
