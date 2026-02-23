@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["python311", "nodejs_20"]
+
+[phases.install]
+cmds = [
+  "pip install -r backend/requirements.txt",
+  "npm install --prefix frontend"
+]
+
+[phases.build]
+cmds = [
+  "npm run build --prefix frontend"
+]
+
+[start]
+cmd = "gunicorn --chdir backend wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"

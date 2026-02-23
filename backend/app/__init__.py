@@ -1,6 +1,6 @@
 import os
 import cloudinary
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
@@ -53,5 +53,22 @@ def create_app(config_name=None):
     @app.route('/api/health')
     def health():
         return {'status': 'ok'}
+
+    # Serve React SPA in production (when frontend/dist exists)
+    _frontend_dist = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..', '..', 'frontend', 'dist'
+    )
+    _frontend_dist = os.path.normpath(_frontend_dist)
+
+    if os.path.isdir(_frontend_dist):
+        @app.route('/', defaults={'path': ''})
+        @app.route('/<path:path>')
+        def serve_frontend(path):
+            if path.startswith('api/'):
+                return {'error': 'not found'}, 404
+            full = os.path.join(_frontend_dist, path)
+            if path and os.path.exists(full):
+                return send_from_directory(_frontend_dist, path)
+            return send_from_directory(_frontend_dist, 'index.html')
 
     return app
