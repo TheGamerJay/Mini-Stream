@@ -84,7 +84,7 @@ export default function Landing() {
               indie storytelling. No algorithm manipulation — just great content.
             </p>
             <div className="creator-cta__actions">
-              <Link to="/signup" className="btn btn-primary">Create an Account</Link>
+              <Link to="/signup" className="btn btn-primary">Get Started</Link>
               <Link to="/how-it-works" className="btn btn-ghost">How It Works</Link>
             </div>
           </div>
