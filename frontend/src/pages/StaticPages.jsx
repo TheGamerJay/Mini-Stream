@@ -106,29 +106,34 @@ export function DMCA() {
 export function Privacy() {
   return (
     <StaticPage title="Privacy Policy">
-      <p>Last updated: {new Date().getFullYear()}</p>
+      <p>Last updated: 2026</p>
+      <p>MiniStream is committed to protecting your privacy. This policy explains what information we collect, how we use it, and what we do not do with your data.</p>
       <h2>Information We Collect</h2>
+      <p>We may collect the following information:</p>
       <ul>
-        <li>Account information: email address, display name</li>
-        <li>Content you upload and associated metadata</li>
-        <li>Basic usage data: pages visited, videos watched (not shared publicly)</li>
+        <li>Account information, such as your email address and display name</li>
+        <li>Content you upload to the platform and associated metadata</li>
+        <li>Basic usage data, such as pages visited and videos watched</li>
       </ul>
-      <h2>How We Use It</h2>
+      <p>Usage data is collected for platform functionality and is not shared publicly.</p>
+      <h2>How We Use Information</h2>
+      <p>We use collected information for the following purposes:</p>
       <ul>
-        <li>To operate your account and provide the platform</li>
+        <li>To operate and maintain your account</li>
         <li>To display your content to viewers</li>
-        <li>To provide creators with private view statistics</li>
+        <li>To provide creators with private viewing and performance statistics</li>
       </ul>
       <h2>What We Do Not Do</h2>
+      <p>MiniStream does not:</p>
       <ul>
-        <li>We do not sell your personal data</li>
-        <li>We do not display public social metrics (likes, followers, comments)</li>
-        <li>We do not use your data for advertising targeting</li>
+        <li>Sell personal data</li>
+        <li>Display public social metrics such as likes, followers, or comments</li>
+        <li>Use personal data for advertising or tracking-based marketing</li>
       </ul>
       <h2>Data Retention</h2>
-      <p>We retain account data as long as your account is active. You may request deletion by contacting us at ministream.help@gmail.com.</p>
+      <p>Account data is retained for as long as your account remains active. You may request deletion of your account and associated data by contacting ministream.help@gmail.com.</p>
       <h2>Contact</h2>
-      <p>For privacy concerns, contact ministream.help@gmail.com.</p>
+      <p>For privacy-related questions or concerns, please contact ministream.help@gmail.com.</p>
     </StaticPage>
   )
 }
