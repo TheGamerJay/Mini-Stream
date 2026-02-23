@@ -86,19 +86,19 @@ export function ContentRules() {
 export function DMCA() {
   return (
     <StaticPage title="Copyright / DMCA">
-      <p>MiniStream respects intellectual property rights. If you believe content on this platform infringes your copyright, please submit a DMCA takedown notice.</p>
-      <h2>How to Submit a DMCA Notice</h2>
-      <p>Send an email to <strong>ministream.help@gmail.com</strong> with the following information:</p>
-      <ol>
+      <p>MiniStream respects intellectual property rights and expects all creators to do the same. Creators are responsible for ensuring they have the legal right to upload and share any content they submit to the platform.</p>
+      <h2>Reporting Copyright Issues</h2>
+      <p>If you believe content available on MiniStream infringes your copyright, you may request its removal by contacting MiniStream directly.</p>
+      <h2>Information Required</h2>
+      <p>Please send an email to <strong>ministream.help@gmail.com</strong> including the following details:</p>
+      <ul>
         <li>Your full legal name and contact information</li>
-        <li>A description of the copyrighted work you claim has been infringed</li>
-        <li>The URL(s) of the allegedly infringing content on MiniStream</li>
-        <li>A statement that you have a good faith belief that the use is not authorized</li>
-        <li>A statement, under penalty of perjury, that the information is accurate and you are the rights holder or authorized to act on their behalf</li>
-        <li>Your physical or electronic signature</li>
-      </ol>
-      <h2>Disclaimer</h2>
-      <p>MiniStream does not claim ownership of any content uploaded by creators. All uploaded content is the sole responsibility of the creator who uploaded it. MiniStream acts as a platform and responds to valid DMCA notices in accordance with applicable law.</p>
+        <li>A description of the copyrighted work you believe has been infringed</li>
+        <li>The URL or clear identification of the content you believe violates your rights</li>
+        <li>A statement that you have a good-faith belief the use is not authorized</li>
+        <li>A statement confirming the information you provide is accurate and that you are authorized to act on behalf of the rights holder</li>
+        <li>Your electronic signature</li>
+      </ul>
     </StaticPage>
   )
 }
