@@ -12,15 +12,15 @@ WORKDIR /app
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# Install and build React frontend
+# Install Node dependencies
 COPY frontend/package*.json frontend/
 RUN npm install --prefix frontend
 
-COPY frontend/ frontend/
-RUN npm run build --prefix frontend
+# Copy ALL source files — any change invalidates this layer and forces rebuild
+COPY . .
 
-# Copy backend
-COPY backend/ backend/
+# Build frontend (always runs when source changes)
+RUN npm run build --prefix frontend
 
 EXPOSE 8080
 
