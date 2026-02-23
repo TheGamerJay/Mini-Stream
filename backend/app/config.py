@@ -8,9 +8,9 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=2)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DATABASE_URL', 'postgresql://localhost/ministream'
-    )
+    # Railway uses postgres:// — SQLAlchemy requires postgresql://
+    _db_url = os.environ.get('DATABASE_URL', 'postgresql://localhost/ministream')
+    SQLALCHEMY_DATABASE_URI = _db_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
