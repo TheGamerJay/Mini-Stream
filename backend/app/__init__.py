@@ -43,12 +43,14 @@ def create_app(config_name=None):
     from .routes.series import series_bp
     from .routes.creator import creator_bp
     from .routes.discover import discover_bp
+    from .routes.admin import admin_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(videos_bp, url_prefix='/api/videos')
     app.register_blueprint(series_bp, url_prefix='/api/series')
     app.register_blueprint(creator_bp, url_prefix='/api/creator')
     app.register_blueprint(discover_bp, url_prefix='/api/discover')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
     @app.route('/api/health')
     def health():

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -15,6 +15,7 @@ import WatchLater from './pages/WatchLater'
 import BecomeCreator from './pages/BecomeCreator'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import Admin from './pages/Admin'
 import {
   About, HowItWorks, ContentRules, DMCA, Privacy, Terms, Contact,
 } from './pages/StaticPages'
@@ -36,6 +37,13 @@ function PublicOnlyRoute({ children }) {
 }
 
 function AppRoutes() {
+  const location = useLocation()
+  const isAdmin = location.pathname === '/Admin'
+
+  if (isAdmin) {
+    return <Admin />
+  }
+
   return (
     <>
       <Navbar />
