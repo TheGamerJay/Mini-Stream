@@ -78,6 +78,14 @@
   padding-right: 44px;
 }
 
+/* Hide browser-native password reveal button */
+.admin-password-wrap input::-ms-reveal,
+.admin-password-wrap input::-ms-clear,
+.admin-password-wrap input::-webkit-credentials-auto-fill-button,
+.admin-password-wrap input::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
 .admin-eye-btn {
   position: absolute;
   right: 10px;
