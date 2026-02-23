@@ -102,6 +102,7 @@ export default function Watch() {
           {/* Tags */}
           <div className="watch-tags">
             {video.genre && <span className="tag tag-cyan">{video.genre}</span>}
+            {video.content_rating && <span className="tag tag-rating">{video.content_rating}</span>}
             {video.language && <span className="tag tag-neutral">{video.language}</span>}
             {video.series_title && <span className="tag tag-violet">Series</span>}
             {video.episode_number && (

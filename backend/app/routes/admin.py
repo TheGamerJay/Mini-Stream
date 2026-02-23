@@ -223,7 +223,7 @@ def _vurl(i):
 _DEMO_SERIES = [
     {
         'ci': 0, 'title': 'Shadow Realm Chronicles', 'genre': 'Fantasy', 'language': 'English',
-        'rating': 'Mature', 'thumb': _thumb('shadow_realm'),
+        'rating': 'TV-MA', 'thumb': _thumb('shadow_realm'),
         'desc': 'A dark fantasy epic following a cursed warrior navigating a world where shadows are alive.',
         'episodes': [
             ('The Cursed Blade', 'Kira discovers an ancient sword that bonds to her soul.', 1),
@@ -234,7 +234,7 @@ _DEMO_SERIES = [
     },
     {
         'ci': 0, 'title': 'Cafe Soleil', 'genre': 'Slice of Life', 'language': 'English',
-        'rating': 'General', 'thumb': _thumb('cafe_soleil'),
+        'rating': 'TV-G', 'thumb': _thumb('cafe_soleil'),
         'desc': 'A warm series about the staff and regulars of a small seaside café.',
         'episodes': [
             ('Opening Day', 'The café opens its doors for the first time.', 1),
@@ -244,7 +244,7 @@ _DEMO_SERIES = [
     },
     {
         'ci': 1, 'title': 'Neon Drift', 'genre': 'Action', 'language': 'English',
-        'rating': 'Mature', 'thumb': _thumb('neon_drift'),
+        'rating': 'TV-14', 'thumb': _thumb('neon_drift'),
         'desc': 'Underground street racers in a cyberpunk megacity fight for territory and survival.',
         'episodes': [
             ('Zero to Sixty', 'Ryo enters his first illegal street race.', 1),
@@ -255,7 +255,7 @@ _DEMO_SERIES = [
     },
     {
         'ci': 1, 'title': 'The Mechanical Garden', 'genre': 'Sci-Fi', 'language': 'English',
-        'rating': 'General', 'thumb': _thumb('mech_garden'),
+        'rating': 'TV-G', 'thumb': _thumb('mech_garden'),
         'desc': 'In a world run by clockwork automata, one girl befriends a broken-down robot gardener.',
         'episodes': [
             ('Rust and Petals', "Emilia finds Unit 7 half-buried in her grandmother's garden.", 1),
@@ -265,7 +265,7 @@ _DEMO_SERIES = [
     },
     {
         'ci': 2, 'title': 'Phantom Signal', 'genre': 'Mystery', 'language': 'English',
-        'rating': 'General', 'thumb': _thumb('phantom_signal'),
+        'rating': 'TV-PG', 'thumb': _thumb('phantom_signal'),
         'desc': 'A radio operator begins receiving transmissions from someone who died 30 years ago.',
         'episodes': [
             ('Dead Air', 'The first voice breaks through on a stormy night.', 1),
@@ -280,40 +280,40 @@ _DEMO_SERIES = [
 # video_url_or_None = None  →  uses rotating _vurl(i) placeholder
 # video_url_or_None = URL   →  uses that specific video (real public-domain anime from archive.org)
 _STANDALONE = [
-    (0, 'The Watcher (Short Film)', 'Horror', 'A lone security guard discovers something is watching him through the cameras.', 'Mature', None),
-    (0, 'Bloom — An Animated Short', 'Experimental', 'A wordless meditation on growth, loss, and returning home.', 'General', None),
-    (1, 'Midnight Ramen', 'Slice of Life', 'A chef finds unexpected company in his empty restaurant at 2AM.', 'General', None),
-    (1, 'Steel and Sky', 'Action', 'A ronin takes a final job that forces her to face her past.', 'Mature', None),
-    (2, 'Orbit', 'Sci-Fi', 'Two astronauts stranded in orbit must decide who comes home.', 'General', None),
-    (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'General', None),
-    (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'General', None),
-    (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'General', None),
+    (0, 'The Watcher (Short Film)', 'Horror', 'A lone security guard discovers something is watching him through the cameras.', 'TV-MA', None),
+    (0, 'Bloom — An Animated Short', 'Experimental', 'A wordless meditation on growth, loss, and returning home.', 'TV-G', None),
+    (1, 'Midnight Ramen', 'Slice of Life', 'A chef finds unexpected company in his empty restaurant at 2AM.', 'TV-G', None),
+    (1, 'Steel and Sky', 'Action', 'A ronin takes a final job that forces her to face her past.', 'TV-14', None),
+    (2, 'Orbit', 'Sci-Fi', 'Two astronauts stranded in orbit must decide who comes home.', 'TV-PG', None),
+    (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'TV-PG', None),
+    (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'TV-PG', None),
+    (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'TV-G', None),
     # Real public-domain anime from Internet Archive
     (0, 'Speed Racer — The Great Plan Pt. 1', 'Anime',
      'Mach 5 driver Go Mifune competes in the most dangerous race of his life. Classic 1967 anime.',
-     'General',
+     'TV-G',
      'https://archive.org/download/speed-racer-episode-03/Speed%20Racer%20Episode%2001.mp4'),
     (1, 'Gigantor — The Plot to Steal the Sun', 'Isekai',
      'A boy and his giant robot are humanity\'s last defence against a power-hungry villain. 1993 anime.',
-     'General',
+     'TV-G',
      'https://archive.org/download/the-new-adventures-of-gigantor/The%20New%20Adventures%20of%20Gigantor%2001%20-%20The%20Plot%20to%20Steal%20the%20Sun.mp4'),
     (2, 'Cyborg 009 — Episode 1', 'Seinen',
      'Nine ordinary people are kidnapped and turned into cyborg soldiers. Ishinomori\'s dark 1968 action anime.',
-     'Mature',
+     'TV-14',
      'https://archive.org/download/cyborg-009-1968/%5BBunny_Hat_Raw%5DCyborg_009_%281968%29_01_%28BB69BBAA%29.mp4'),
     (0, 'Jungle Emperor — Episode 1', 'Shojo',
      'Kimba the white lion cub journeys from Africa to Japan in search of his destiny. Tezuka\'s classic 1965 anime.',
-     'General',
+     'TV-G',
      'https://archive.org/download/jungletaitei/Jungle%20Taitei%20(1965)%20-%2001%20%5B1080p%5D.mp4',
      'Japanese'),
     (1, 'Speed Racer — The New Adventures Ep. 1', 'Shonen',
      'Go Mifune returns in an all-new high-speed adventure. 1993 revival series.',
-     'General',
+     'TV-G',
      'https://archive.org/download/new-adventures-of-speed-racer/The%20New%20Adventures%20of%20Speed%20Racer%20E01%20-%20The%20Mach-5s%20First%20Trial.mp4'),
-    (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'Mature', None),
-    (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'Mature', None),
-    (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'General', None),
-    (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'General', None),
+    (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'TV-MA', None),
+    (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'TV-14', None),
+    (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'TV-PG', None),
+    (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'TV-14', None),
 ]
 
 

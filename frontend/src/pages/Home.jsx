@@ -12,6 +12,7 @@ const GENRES = [
   'Horror','Supernatural','Thriller','Sci-Fi','Mystery','Psychological',
   'Slice of Life','Mecha','Isekai','Historical','Seinen','Shojo','Shonen','Experimental',
 ]
+const RATINGS = ['TV-G', 'TV-PG', 'TV-14', 'TV-MA']
 
 export default function Home() {
   const { user } = useAuth()
@@ -21,6 +22,7 @@ export default function Home() {
 
   // Filters
   const [activeGenre, setActiveGenre] = useState(searchParams.get('genre') || '')
+  const [activeRating, setActiveRating] = useState(searchParams.get('rating') || '')
   const [q, setQ] = useState(searchParams.get('q') || '')
   const [submittedQ, setSubmittedQ] = useState(searchParams.get('q') || '')
 
@@ -31,7 +33,7 @@ export default function Home() {
   const [total, setTotal] = useState(0)
   const [loadingBrowse, setLoadingBrowse] = useState(false)
 
-  const isFiltered = !!activeGenre || !!submittedQ
+  const isFiltered = !!activeGenre || !!activeRating || !!submittedQ
 
   useEffect(() => {
     getHomeData()
@@ -40,11 +42,12 @@ export default function Home() {
       .finally(() => setLoadingHome(false))
   }, [])
 
-  const fetchBrowse = useCallback(async (p, genre, query) => {
+  const fetchBrowse = useCallback(async (p, genre, rating, query) => {
     setLoadingBrowse(true)
     try {
       const params = { page: p }
       if (genre) params.genre = genre
+      if (rating) params.rating = rating
       if (query) params.q = query
       const { data } = await browseVideos(params)
       if (p === 1) setVideos(data.videos)
@@ -58,30 +61,39 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isFiltered) fetchBrowse(1, activeGenre, submittedQ)
+    if (isFiltered) fetchBrowse(1, activeGenre, activeRating, submittedQ)
     else setVideos([])
-  }, [activeGenre, submittedQ]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeGenre, activeRating, submittedQ]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const buildParams = (genre, rating, query) => {
+    const p = {}
+    if (genre) p.genre = genre
+    if (rating) p.rating = rating
+    if (query) p.q = query
+    return p
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
     setSubmittedQ(q)
-    const p = {}
-    if (q) p.q = q
-    if (activeGenre) p.genre = activeGenre
-    setSearchParams(p)
+    setSearchParams(buildParams(activeGenre, activeRating, q))
   }
 
   const handleGenre = (genre) => {
     const next = activeGenre === genre ? '' : genre
     setActiveGenre(next)
-    const p = {}
-    if (next) p.genre = next
-    if (submittedQ) p.q = submittedQ
-    setSearchParams(p)
+    setSearchParams(buildParams(next, activeRating, submittedQ))
+  }
+
+  const handleRating = (rating) => {
+    const next = activeRating === rating ? '' : rating
+    setActiveRating(next)
+    setSearchParams(buildParams(activeGenre, next, submittedQ))
   }
 
   const clearAll = () => {
     setActiveGenre('')
+    setActiveRating('')
     setQ('')
     setSubmittedQ('')
     setSearchParams({})
@@ -89,9 +101,7 @@ export default function Home() {
 
   const selectAll = () => {
     setActiveGenre('')
-    const p = {}
-    if (submittedQ) p.q = submittedQ
-    setSearchParams(p)
+    setSearchParams(buildParams('', activeRating, submittedQ))
   }
 
   if (loadingHome && !homeData && !isFiltered) {
@@ -148,6 +158,22 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Rating filter strip */}
+        <div className="rating-tabs-wrap">
+          <span className="rating-tabs-label">Rating:</span>
+          <div className="rating-tabs">
+            {RATINGS.map((r) => (
+              <button
+                key={r}
+                className={`rating-tab${activeRating === r ? ' active' : ''}`}
+                onClick={() => handleRating(r)}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Result count when filtered */}
         {isFiltered && !loadingBrowse && (
           <p className="home-results-count">
@@ -155,6 +181,7 @@ export default function Home() {
               ? 'No videos found.'
               : `${total.toLocaleString()} video${total !== 1 ? 's' : ''}`}
             {activeGenre && ` in ${activeGenre}`}
+            {activeRating && ` · ${activeRating}`}
             {submittedQ && ` · "${submittedQ}"`}
           </p>
         )}
@@ -172,7 +199,7 @@ export default function Home() {
             </div>
             {page < pages && !loadingBrowse && (
               <div className="home-load-more">
-                <button className="btn btn-ghost" onClick={() => fetchBrowse(page + 1, activeGenre, submittedQ)}>
+                <button className="btn btn-ghost" onClick={() => fetchBrowse(page + 1, activeGenre, activeRating, submittedQ)}>
                   Load More
                 </button>
               </div>

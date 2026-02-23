@@ -22,7 +22,30 @@
 .home-search-input { flex: 1; }
 
 /* Genre tab strip — wraps to show all genres */
-.genre-tabs-wrap { margin-bottom: 28px; }
+.genre-tabs-wrap { margin-bottom: 12px; }
+.rating-tabs-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.rating-tabs-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+.rating-tabs { display: flex; gap: 6px; }
+.rating-tab {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  letter-spacing: 0.04em;
+}
+.rating-tab:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.rating-tab.active { background: #fff; border-color: #fff; color: #000; }
 .genre-tabs {
   display: flex;
   flex-wrap: wrap;

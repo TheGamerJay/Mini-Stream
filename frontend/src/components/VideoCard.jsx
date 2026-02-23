@@ -25,6 +25,9 @@ export default function VideoCard({ item, type = 'video' }) {
             </svg>
           </div>
         </div>
+        {item.content_rating && (
+          <span className="video-card__rating">{item.content_rating}</span>
+        )}
         {item.duration_formatted && (
           <span className="video-card__duration">{item.duration_formatted}</span>
         )}

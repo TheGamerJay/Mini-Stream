@@ -11,6 +11,7 @@ GENRES = [
     'Experimental',
 ]
 LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
+RATINGS = ['TV-G', 'TV-PG', 'TV-14', 'TV-MA']
 
 
 @discover_bp.route('/home', methods=['GET'])
@@ -106,6 +107,7 @@ def search():
 def browse():
     genre = request.args.get('genre', '').strip()
     language = request.args.get('language', '').strip()
+    rating = request.args.get('rating', '').strip()
     q = request.args.get('q', '').strip()
     page = request.args.get('page', 1, type=int)
     per_page = 24
@@ -117,6 +119,8 @@ def browse():
         video_query = video_query.filter_by(genre=genre)
     if language:
         video_query = video_query.filter_by(language=language)
+    if rating:
+        video_query = video_query.filter_by(content_rating=rating)
 
     paginated = video_query.order_by(Video.view_count.desc()).paginate(
         page=page, per_page=per_page, error_out=False
@@ -137,3 +141,8 @@ def genres():
 @discover_bp.route('/languages', methods=['GET'])
 def languages():
     return jsonify({'languages': LANGUAGES})
+
+
+@discover_bp.route('/ratings', methods=['GET'])
+def ratings():
+    return jsonify({'ratings': RATINGS})

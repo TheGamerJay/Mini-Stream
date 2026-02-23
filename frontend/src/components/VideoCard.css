@@ -63,6 +63,19 @@
   box-shadow: var(--glow-cyan);
 }
 
+.video-card__rating {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+}
 .video-card__duration {
   position: absolute;
   bottom: 8px;
