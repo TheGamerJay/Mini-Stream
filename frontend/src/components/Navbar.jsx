@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
@@ -7,6 +7,18 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const lastY = useRef(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const y = window.scrollY
+      setHidden(y > lastY.current && y > 80)
+      lastY.current = y
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -14,7 +26,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="navbar">
+    <header className={`navbar${hidden ? ' navbar--hidden' : ''}`}>
       <div className="navbar__inner container">
         <Link to={user ? '/home' : '/'} className="navbar__logo">
           <img src="/Mini Stream logo.png" alt="MiniStream" className="navbar__logo-img" />

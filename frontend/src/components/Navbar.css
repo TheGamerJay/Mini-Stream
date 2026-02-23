@@ -9,6 +9,10 @@
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease;
+}
+.navbar--hidden {
+  transform: translateY(-100%);
 }
 
 .navbar__inner {
