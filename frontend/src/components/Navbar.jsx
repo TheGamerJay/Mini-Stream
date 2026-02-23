@@ -39,6 +39,7 @@ export default function Navbar() {
         {user && (
           <nav className="navbar__nav">
             <NavLink to="/home" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Discover</NavLink>
+            <NavLink to="/browse" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Browse</NavLink>
             <NavLink to="/watch-later" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Watch Later</NavLink>
             {user.is_creator && (
               <NavLink to="/creator" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Dashboard</NavLink>
@@ -69,6 +70,9 @@ export default function Navbar() {
                     <div className="dropdown-name">{user.display_name}</div>
                     <div className="dropdown-email">{user.email}</div>
                     <hr />
+                    <Link to="/profile" onClick={() => setMenuOpen(false)} className="dropdown-item">
+                      Profile Settings
+                    </Link>
                     {!user.is_creator && (
                       <Link to="/become-creator" onClick={() => setMenuOpen(false)} className="dropdown-item">
                         Become a Creator
@@ -96,6 +100,9 @@ export default function Navbar() {
           <NavLink to="/home" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
             Discover
           </NavLink>
+          <NavLink to="/browse" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
+            Browse
+          </NavLink>
           <NavLink to="/watch-later" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
             Watch Later
           </NavLink>
@@ -104,6 +111,9 @@ export default function Navbar() {
               Dashboard
             </NavLink>
           )}
+          <NavLink to="/profile" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
+            Profile Settings
+          </NavLink>
           {!user.is_creator && (
             <NavLink to="/become-creator" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
               Become a Creator

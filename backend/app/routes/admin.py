@@ -173,6 +173,17 @@ def admin_delete_user(user_id):
     return jsonify({'message': 'User deleted'})
 
 
+@admin_bp.route('/series/<int:series_id>', methods=['DELETE'])
+@require_admin
+def admin_delete_series(series_id):
+    series = Series.query.get_or_404(series_id)
+    for ep in list(series.episodes):
+        db.session.delete(ep)
+    db.session.delete(series)
+    db.session.commit()
+    return jsonify({'message': 'Series deleted'})
+
+
 @admin_bp.route('/videos/<int:video_id>', methods=['DELETE'])
 @require_admin
 def admin_delete_video(video_id):

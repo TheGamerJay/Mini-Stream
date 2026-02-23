@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   getStats, getMyVideos, getMySeries,
-  uploadVideo, createSeries, updateVideo, deleteVideo,
+  uploadVideo, createSeries, updateSeries, updateVideo, deleteVideo,
 } from '../api'
 import './CreatorDashboard.css'
 
@@ -217,6 +217,106 @@ function SeriesForm({ onSuccess }) {
   )
 }
 
+function SeriesTab({ seriesList, onRefresh }) {
+  const [editingId, setEditingId] = useState(null)
+  const [editForm, setEditForm] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [editError, setEditError] = useState('')
+
+  const startEdit = (s) => {
+    setEditingId(s.id)
+    setEditForm({ title: s.title, description: s.description || '', genre: s.genre, language: s.language, content_rating: s.content_rating })
+    setEditError('')
+  }
+
+  const cancelEdit = () => { setEditingId(null); setEditError('') }
+
+  const setF = (k, v) => setEditForm((f) => ({ ...f, [k]: v }))
+
+  const saveEdit = async (id) => {
+    setSaving(true)
+    setEditError('')
+    try {
+      await updateSeries(id, editForm)
+      setEditingId(null)
+      onRefresh()
+    } catch (err) {
+      setEditError(err.response?.data?.error || 'Failed to save.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div>
+      <h2 className="panel-heading">Create a New Series</h2>
+      <p className="panel-sub">Organize your episodes into a series for a better viewing experience.</p>
+      <SeriesForm onSuccess={onRefresh} />
+      {seriesList.length > 0 && (
+        <div className="series-list-section">
+          <h3>Your Series</h3>
+          <div className="series-list">
+            {seriesList.map((s) => (
+              <div key={s.id} className="series-list-item">
+                {editingId === s.id ? (
+                  <div className="series-edit-form">
+                    {editError && <div className="auth-error" style={{ marginBottom: 12 }}>{editError}</div>}
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Title</label>
+                        <input className="form-input" value={editForm.title} onChange={e => setF('title', e.target.value)} required />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Genre</label>
+                        <select className="form-input" value={editForm.genre} onChange={e => setF('genre', e.target.value)}>
+                          {GENRES.map(g => <option key={g}>{g}</option>)}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Language</label>
+                        <select className="form-input" value={editForm.language} onChange={e => setF('language', e.target.value)}>
+                          {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Rating</label>
+                        <select className="form-input" value={editForm.content_rating} onChange={e => setF('content_rating', e.target.value)}>
+                          {RATINGS.map(r => <option key={r}>{r}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Description</label>
+                      <textarea className="form-input" value={editForm.description} onChange={e => setF('description', e.target.value)} rows={2} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                      <button className="btn btn-primary" disabled={saving} onClick={() => saveEdit(s.id)}>
+                        {saving ? 'Saving…' : 'Save'}
+                      </button>
+                      <button className="btn btn-ghost" onClick={cancelEdit}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {s.thumbnail_url && <img src={s.thumbnail_url} alt={s.title} className="series-list-thumb" />}
+                    <div style={{ flex: 1 }}>
+                      <p className="series-list-title">{s.title}</p>
+                      <p className="series-list-meta">{s.genre} · {s.language} · {s.episode_count} episodes</p>
+                    </div>
+                    <button className="btn btn-ghost" style={{ fontSize: '0.8rem', padding: '6px 12px' }} onClick={() => startEdit(s)}>
+                      Edit
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CreatorDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -325,27 +425,7 @@ export default function CreatorDashboard() {
           )}
 
           {tab === 'series' && (
-            <div>
-              <h2 className="panel-heading">Create a New Series</h2>
-              <p className="panel-sub">Organize your episodes into a series for a better viewing experience.</p>
-              <SeriesForm onSuccess={load} />
-              {seriesList.length > 0 && (
-                <div className="series-list-section">
-                  <h3>Your Series</h3>
-                  <div className="series-list">
-                    {seriesList.map((s) => (
-                      <div key={s.id} className="series-list-item">
-                        {s.thumbnail_url && <img src={s.thumbnail_url} alt={s.title} className="series-list-thumb" />}
-                        <div>
-                          <p className="series-list-title">{s.title}</p>
-                          <p className="series-list-meta">{s.genre} · {s.episode_count} episodes</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <SeriesTab seriesList={seriesList} onRefresh={load} />
           )}
 
           {tab === 'manage' && (

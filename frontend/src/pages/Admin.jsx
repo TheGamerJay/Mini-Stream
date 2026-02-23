@@ -464,6 +464,12 @@ function SeriesTab({ token }) {
     setQuery(search)
   }
 
+  async function deleteSeries(id) {
+    if (!confirm('Delete this series and ALL its episodes? This cannot be undone.')) return
+    await adminFetch(`/series/${id}`, token, { method: 'DELETE' })
+    load()
+  }
+
   return (
     <div>
       <div className="admin-search-row">
@@ -495,6 +501,7 @@ function SeriesTab({ token }) {
                   <th>Episodes</th>
                   <th>Status</th>
                   <th>Created</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -516,6 +523,11 @@ function SeriesTab({ token }) {
                       </span>
                     </td>
                     <td>{fmtDateTime(s.created_at)}</td>
+                    <td>
+                      <button className="admin-del-btn" onClick={() => deleteSeries(s.id)}>
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

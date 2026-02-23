@@ -102,6 +102,33 @@ def search():
     })
 
 
+@discover_bp.route('/browse', methods=['GET'])
+def browse():
+    genre = request.args.get('genre', '').strip()
+    language = request.args.get('language', '').strip()
+    q = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 24
+
+    video_query = Video.query.filter_by(is_published=True)
+    if q:
+        video_query = video_query.filter(Video.title.ilike(f'%{q}%'))
+    if genre:
+        video_query = video_query.filter_by(genre=genre)
+    if language:
+        video_query = video_query.filter_by(language=language)
+
+    paginated = video_query.order_by(Video.view_count.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    return jsonify({
+        'videos': [v.to_dict() for v in paginated.items],
+        'total': paginated.total,
+        'pages': paginated.pages,
+        'page': page,
+    })
+
+
 @discover_bp.route('/genres', methods=['GET'])
 def genres():
     return jsonify({'genres': GENRES})

@@ -57,6 +57,7 @@ export const resetPassword = (data) => api.post('/auth/reset-password', data)
 export const getHomeData = () => api.get('/discover/home')
 export const search = (params) => api.get('/discover/search', { params })
 export const getGenres = () => api.get('/discover/genres')
+export const browseVideos = (params) => api.get('/discover/browse', { params })
 
 // Videos
 export const getVideo = (id) => api.get(`/videos/${id}`)

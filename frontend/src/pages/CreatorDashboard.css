@@ -136,12 +136,13 @@
 .series-list { display: flex; flex-direction: column; gap: 8px; }
 .series-list-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   padding: 12px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  flex-wrap: wrap;
 }
 .series-list-thumb {
   width: 60px;
@@ -151,6 +152,7 @@
 }
 .series-list-title { font-size: 0.9rem; font-weight: 600; }
 .series-list-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+.series-edit-form { width: 100%; padding: 4px 0; }
 
 /* Manage */
 .manage-list { display: flex; flex-direction: column; gap: 8px; }

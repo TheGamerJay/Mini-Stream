@@ -6,7 +6,10 @@
       "Bash(git -C \"c:/Users/jaaye/OneDrive/Desktop/Mini Stream\" remote -v)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(python3:*)",
+      "Bash(python seed_demo.py:*)",
+      "Bash(pip install:*)"
     ]
   }
 }
