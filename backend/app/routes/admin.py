@@ -283,6 +283,12 @@ _STANDALONE = [
     (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'General'),
     (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'General'),
     (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'General'),
+    # Anime, Isekai, Seinen, Shojo, Shonen
+    (0, 'Sakura Protocol', 'Anime', 'A student council president discovers her school is a front for an ancient order of warriors.', 'General'),
+    (1, 'Another World, Same Me', 'Isekai', 'A burned-out office worker reincarnates into a fantasy world — and immediately wants to retire again.', 'General'),
+    (2, 'Under the Overpass', 'Seinen', 'A retired hitman runs a late-night convenience store and tries very hard not to get involved in things.', 'Mature'),
+    (0, 'Letters in Lavender', 'Shojo', 'Two childhood friends separated for six years start exchanging handwritten letters without knowing each other\'s new identities.', 'General'),
+    (1, 'Iron Bracket', 'Shonen', 'A middle schooler with zero talent enters the national arm-wrestling circuit on a dare and refuses to lose.', 'General'),
     (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'Mature'),
     (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'Mature'),
     (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'General'),

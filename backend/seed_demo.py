@@ -133,6 +133,12 @@ STANDALONE_VIDEOS = [
     {'creator_idx': 0, 'title': 'Voltage', 'genre': 'Action', 'desc': 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'rating': 'Mature'},
     {'creator_idx': 1, 'title': 'The Cartographer', 'genre': 'Adventure', 'desc': 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'rating': 'General'},
     {'creator_idx': 2, 'title': 'Soft Shutdown', 'genre': 'Psychological', 'desc': 'A therapist realizes her newest patient may not be entirely human.', 'rating': 'General'},
+    # Anime, Isekai, Seinen, Shojo, Shonen
+    {'creator_idx': 0, 'title': 'Sakura Protocol', 'genre': 'Anime', 'desc': 'A student council president discovers her school is a front for an ancient order of warriors.', 'rating': 'General'},
+    {'creator_idx': 1, 'title': 'Another World, Same Me', 'genre': 'Isekai', 'desc': 'A burned-out office worker reincarnates into a fantasy world — and immediately wants to retire again.', 'rating': 'General'},
+    {'creator_idx': 2, 'title': 'Under the Overpass', 'genre': 'Seinen', 'desc': 'A retired hitman runs a late-night convenience store and tries very hard not to get involved in things.', 'rating': 'Mature'},
+    {'creator_idx': 0, 'title': 'Letters in Lavender', 'genre': 'Shojo', 'desc': "Two childhood friends separated for six years start exchanging handwritten letters without knowing each other's new identities.", 'rating': 'General'},
+    {'creator_idx': 1, 'title': 'Iron Bracket', 'genre': 'Shonen', 'desc': 'A middle schooler with zero talent enters the national arm-wrestling circuit on a dare and refuses to lose.', 'rating': 'General'},
 ]
 
 
