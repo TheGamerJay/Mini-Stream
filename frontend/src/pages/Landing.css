@@ -35,6 +35,14 @@
   max-width: 600px;
   padding: 80px 24px;
 }
+.landing-hero__logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 32px rgba(0, 212, 255, 0.35));
+}
+
 .landing-hero__badge { margin-bottom: 20px; }
 .landing-hero__title {
   font-size: clamp(2rem, 5vw, 3.6rem);

@@ -36,7 +36,9 @@ export default function Signup() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-card__header">
-          <Link to="/" className="auth-logo">Mini<span className="gradient-text">Stream</span></Link>
+          <Link to="/" className="auth-logo">
+            <img src="/Mini Stream logo.png" alt="MiniStream" className="auth-logo-img" />
+          </Link>
           <h1>Create your account</h1>
           <p>Start watching and creating today</p>
         </div>

@@ -28,6 +28,7 @@ export default function Landing() {
         <div className="landing-hero__glow landing-hero__glow--cyan" />
         <div className="landing-hero__glow landing-hero__glow--violet" />
         <div className="container landing-hero__content">
+          <img src="/Mini Stream logo.png" alt="MiniStream" className="landing-hero__logo" />
           <div className="landing-hero__badge tag tag-cyan">Now Open to Creators</div>
           <h1 className="landing-hero__title">
             Where Indie Creators <br />

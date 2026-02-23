@@ -32,7 +32,9 @@ export default function Login() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-card__header">
-          <Link to="/" className="auth-logo">Mini<span className="gradient-text">Stream</span></Link>
+          <Link to="/" className="auth-logo">
+            <img src="/Mini Stream logo.png" alt="MiniStream" className="auth-logo-img" />
+          </Link>
           <h1>Welcome back</h1>
           <p>Sign in to continue watching</p>
         </div>

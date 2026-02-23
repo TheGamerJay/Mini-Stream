@@ -16,6 +16,14 @@
 .footer__brand {
   max-width: 260px;
 }
+.footer__logo-img {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 10px;
+  display: block;
+}
+
 .footer__logo {
   font-size: 1.3rem;
   font-weight: 800;

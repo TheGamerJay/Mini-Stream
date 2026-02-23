@@ -24,7 +24,7 @@ export default function Navbar() {
     <header className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
       <div className="navbar__inner container">
         <Link to={user ? '/home' : '/'} className="navbar__logo">
-          Mini<span className="gradient-text">Stream</span>
+          <img src="/Mini Stream logo.png" alt="MiniStream" className="navbar__logo-img" />
         </Link>
 
         {user && (

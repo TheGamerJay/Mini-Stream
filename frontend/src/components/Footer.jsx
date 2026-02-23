@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer__top">
           <div className="footer__brand">
-            <span className="footer__logo">Mini<span className="gradient-text">Stream</span></span>
+            <img src="/Mini Stream logo.png" alt="MiniStream" className="footer__logo-img" />
             <p>Original stories. Indie creators. No noise.</p>
           </div>
           <div className="footer__links">
