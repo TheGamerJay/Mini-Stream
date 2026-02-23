@@ -13,6 +13,8 @@ class User(db.Model):
     bio = db.Column(db.Text, nullable=True)
     is_creator = db.Column(db.Boolean, default=False, nullable=False)
     google_id = db.Column(db.String(255), unique=True, nullable=True)
+    reset_token = db.Column(db.String(255), nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

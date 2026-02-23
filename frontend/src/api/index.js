@@ -45,6 +45,8 @@ export const googleAuth = (token) => api.post('/auth/google', { token })
 export const getMe = () => api.get('/auth/me')
 export const becomeCreator = () => api.post('/auth/become-creator')
 export const updateProfile = (data) => api.put('/auth/profile', data)
+export const forgotPassword = (data) => api.post('/auth/forgot-password', data)
+export const resetPassword = (data) => api.post('/auth/reset-password', data)
 
 // Discover
 export const getHomeData = () => api.get('/discover/home')

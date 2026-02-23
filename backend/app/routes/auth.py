@@ -1,3 +1,6 @@
+import os
+import secrets
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token,
@@ -6,8 +9,11 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 import requests as http_requests
+import resend
 from .. import db, bcrypt
 from ..models.user import User
+
+resend.api_key = os.environ.get('RESEND_API_KEY', '')
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -162,3 +168,70 @@ def update_profile():
 
     db.session.commit()
     return jsonify({'user': user.to_dict()})
+
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json()
+    email = (data.get('email', '') if data else '').strip().lower()
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    # Always return success to avoid leaking whether email exists
+    if user and user.password_hash:
+        token = secrets.token_urlsafe(32)
+        user.reset_token = token
+        user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+        db.session.commit()
+
+        base_url = os.environ.get('FRONTEND_URL', 'https://mini-stream-production.up.railway.app')
+        reset_link = f'{base_url}/reset-password?token={token}'
+        from_addr = os.environ.get('RESEND_FROM', 'MiniStream <noreply@ministream.com>')
+        reply_to = os.environ.get('RESEND_REPLY_TO', 'ministream.help@gmail.com')
+
+        try:
+            resend.Emails.send({
+                'from': from_addr,
+                'reply_to': reply_to,
+                'to': [email],
+                'subject': 'Reset your MiniStream password',
+                'html': f'''
+                    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                        <h2 style="color:#00d4ff;margin-bottom:8px;">Reset your password</h2>
+                        <p style="color:#a0a0b0;">You requested a password reset for your MiniStream account.</p>
+                        <p style="color:#a0a0b0;">Click the button below to set a new password. This link expires in 1 hour.</p>
+                        <a href="{reset_link}" style="display:inline-block;margin:24px 0;padding:12px 28px;background:#00d4ff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;">Reset Password</a>
+                        <p style="color:#606070;font-size:13px;">If you didn't request this, you can safely ignore this email.</p>
+                        <hr style="border:none;border-top:1px solid #1e1e2e;margin:24px 0;" />
+                        <p style="color:#606070;font-size:12px;">MiniStream · Original stories. Indie creators. No noise.</p>
+                    </div>
+                ''',
+            })
+        except Exception:
+            pass
+
+    return jsonify({'message': 'If that email is registered, a reset link has been sent.'})
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    token = (data.get('token', '') if data else '').strip()
+    new_password = (data.get('password', '') if data else '')
+
+    if not token or not new_password:
+        return jsonify({'error': 'Token and new password are required'}), 400
+    if len(new_password) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters'}), 400
+
+    user = User.query.filter_by(reset_token=token).first()
+    if not user or not user.reset_token_expires or user.reset_token_expires < datetime.utcnow():
+        return jsonify({'error': 'Invalid or expired reset link'}), 400
+
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    user.reset_token = None
+    user.reset_token_expires = None
+    db.session.commit()
+
+    return jsonify({'message': 'Password updated successfully'})

@@ -13,6 +13,8 @@ import SeriesPage from './pages/SeriesPage'
 import CreatorDashboard from './pages/CreatorDashboard'
 import WatchLater from './pages/WatchLater'
 import BecomeCreator from './pages/BecomeCreator'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import {
   About, HowItWorks, ContentRules, DMCA, Privacy, Terms, Contact,
 } from './pages/StaticPages'
@@ -42,6 +44,8 @@ function AppRoutes() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
           <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+          <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
           <Route path="/watch/:id" element={<PrivateRoute><Watch /></PrivateRoute>} />
           <Route path="/series/:id" element={<PrivateRoute><SeriesPage /></PrivateRoute>} />
