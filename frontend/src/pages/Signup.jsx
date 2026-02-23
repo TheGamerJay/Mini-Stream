@@ -80,7 +80,7 @@ export default function Signup() {
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder="At least 8 characters"
+                placeholder="Min. 8 chars — letters, numbers, symbols ok"
                 value={form.password}
                 onChange={handleChange}
                 required

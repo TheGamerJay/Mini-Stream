@@ -75,7 +75,7 @@ export default function ResetPassword() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder="At least 8 characters"
+                placeholder="Min. 8 chars — letters, numbers, symbols ok"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
