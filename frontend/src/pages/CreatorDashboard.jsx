@@ -99,7 +99,10 @@ function UploadForm({ seriesList, onSuccess }) {
         </div>
         <div className="form-group">
           <label className="form-label">Video Type *</label>
-          <select className="form-input" value={form.video_type} onChange={e => set('video_type', e.target.value)}>
+          <select className="form-input" value={form.video_type} onChange={e => {
+            set('video_type', e.target.value)
+            if (e.target.value !== 'Episode') set('series_id', '')
+          }}>
             {VIDEO_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
@@ -116,27 +119,25 @@ function UploadForm({ seriesList, onSuccess }) {
         <textarea className="form-input" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Describe this video..." rows={3} required />
       </div>
 
-      <div className="form-row">
-        <div className="form-group">
-          <label className="form-label">Assign to Series (optional)</label>
-          <select className="form-input" value={form.series_id} onChange={e => set('series_id', e.target.value)}>
-            <option value="">Standalone video</option>
-            {seriesList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
-          </select>
+      {form.video_type === 'Episode' && (
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Series *</label>
+            <select className="form-input" value={form.series_id} onChange={e => set('series_id', e.target.value)} required>
+              <option value="">— Select a series —</option>
+              {seriesList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Season</label>
+            <input type="number" className="form-input" value={form.season_number} onChange={e => set('season_number', e.target.value)} min="1" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Episode #</label>
+            <input type="number" className="form-input" value={form.episode_number} onChange={e => set('episode_number', e.target.value)} min="1" />
+          </div>
         </div>
-        {form.series_id && (
-          <>
-            <div className="form-group">
-              <label className="form-label">Season</label>
-              <input type="number" className="form-input" value={form.season_number} onChange={e => set('season_number', e.target.value)} min="1" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Episode #</label>
-              <input type="number" className="form-input" value={form.episode_number} onChange={e => set('episode_number', e.target.value)} min="1" />
-            </div>
-          </>
-        )}
-      </div>
+      )}
 
       <div className="form-row">
         <div className="form-group">
