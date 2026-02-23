@@ -54,7 +54,7 @@ def signup():
             'html': f'''
                 <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
                     <div style="text-align:center;margin-bottom:24px;">
-                        <img src="{base_url}/Mini Stream logo.png" alt="MiniStream" style="height:72px;width:auto;" />
+                        <img src="{base_url}/Mini%20Stream%20logo.png" alt="MiniStream" style="height:72px;width:auto;" />
                     </div>
                     <h2 style="color:#00d4ff;margin-bottom:8px;">Welcome, {display_name}!</h2>
                     <p style="color:#a0a0b0;">You&apos;re officially part of MiniStream — the home of original stories and indie creators.</p>
@@ -227,13 +227,16 @@ def forgot_password():
                 'subject': 'Reset your MiniStream password',
                 'html': f'''
                     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#0a0a0f;color:#e5e5e5;border-radius:12px;">
+                        <div style="text-align:center;margin-bottom:24px;">
+                            <img src="{base_url}/Mini%20Stream%20logo.png" alt="MiniStream" style="height:72px;width:auto;" />
+                        </div>
                         <h2 style="color:#00d4ff;margin-bottom:8px;">Reset your password</h2>
                         <p style="color:#a0a0b0;">You requested a password reset for your MiniStream account.</p>
                         <p style="color:#a0a0b0;">Click the button below to set a new password. This link expires in 1 hour.</p>
                         <a href="{reset_link}" style="display:inline-block;margin:24px 0;padding:12px 28px;background:#00d4ff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;">Reset Password</a>
-                        <p style="color:#606070;font-size:13px;">If you didn't request this, you can safely ignore this email.</p>
+                        <p style="color:#606070;font-size:13px;">If you didn&apos;t request this, you can safely ignore this email.</p>
                         <hr style="border:none;border-top:1px solid #1e1e2e;margin:24px 0;" />
-                        <p style="color:#606070;font-size:12px;">MiniStream · Original stories. Indie creators. No noise.</p>
+                        <p style="color:#606070;font-size:12px;text-align:center;">MiniStream · Original stories. Indie creators. No noise.</p>
                     </div>
                 ''',
             })
