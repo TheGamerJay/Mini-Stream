@@ -4,7 +4,13 @@ from ..models.series import Series
 
 discover_bp = Blueprint('discover', __name__)
 
-GENRES = ['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Drama', 'Comedy']
+GENRES = [
+    'Anime', 'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance',
+    'Horror', 'Supernatural', 'Thriller', 'Sci-Fi', 'Mystery', 'Psychological',
+    'Slice of Life', 'Mecha', 'Isekai', 'Historical', 'Seinen', 'Shojo', 'Shonen',
+    'Experimental',
+]
+LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
 
 
 @discover_bp.route('/home', methods=['GET'])
@@ -69,9 +75,10 @@ def home():
 def search():
     q = request.args.get('q', '').strip()
     genre = request.args.get('genre', '').strip()
+    language = request.args.get('language', '').strip()
 
-    if not q and not genre:
-        return jsonify({'error': 'Provide q or genre'}), 400
+    if not q and not genre and not language:
+        return jsonify({'error': 'Provide q, genre, or language'}), 400
 
     video_query = Video.query.filter_by(is_published=True)
     series_query = Series.query.filter_by(is_published=True)
@@ -82,6 +89,9 @@ def search():
     if genre:
         video_query = video_query.filter_by(genre=genre)
         series_query = series_query.filter_by(genre=genre)
+    if language:
+        video_query = video_query.filter_by(language=language)
+        series_query = series_query.filter_by(language=language)
 
     videos = video_query.order_by(Video.view_count.desc()).limit(24).all()
     series = series_query.order_by(Series.created_at.desc()).limit(12).all()
@@ -95,3 +105,8 @@ def search():
 @discover_bp.route('/genres', methods=['GET'])
 def genres():
     return jsonify({'genres': GENRES})
+
+
+@discover_bp.route('/languages', methods=['GET'])
+def languages():
+    return jsonify({'languages': LANGUAGES})

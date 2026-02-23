@@ -12,6 +12,7 @@ class Video(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     genre = db.Column(db.String(50), nullable=False)
+    language = db.Column(db.String(50), nullable=False, default='English')
 
     video_url = db.Column(db.String(500), nullable=False)
     thumbnail_url = db.Column(db.String(500), nullable=True)
@@ -52,6 +53,7 @@ class Video(db.Model):
             'title': self.title,
             'description': self.description,
             'genre': self.genre,
+            'language': self.language,
             'video_url': self.video_url,
             'thumbnail_url': self.thumbnail_url,
             'duration': self.duration,

@@ -18,6 +18,21 @@
 
 .home-search { margin-bottom: 40px; }
 
+.language-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+.filter-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .search-bar {
   display: flex;
   gap: 10px;

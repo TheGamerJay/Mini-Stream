@@ -7,7 +7,13 @@ import {
 } from '../api'
 import './CreatorDashboard.css'
 
-const GENRES = ['Anime', 'Action', 'Fantasy', 'Romance', 'Horror', 'Slice of Life', 'Sci-Fi', 'Mystery', 'Drama', 'Comedy']
+const GENRES = [
+  'Anime', 'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Romance',
+  'Horror', 'Supernatural', 'Thriller', 'Sci-Fi', 'Mystery', 'Psychological',
+  'Slice of Life', 'Mecha', 'Isekai', 'Historical', 'Seinen', 'Shojo', 'Shonen',
+  'Experimental',
+]
+const LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
 
 function StatsBar({ stats }) {
   return (
@@ -30,7 +36,7 @@ function StatsBar({ stats }) {
 
 function UploadForm({ seriesList, onSuccess }) {
   const [form, setForm] = useState({
-    title: '', description: '', genre: GENRES[0],
+    title: '', description: '', genre: GENRES[0], language: LANGUAGES[0],
     series_id: '', episode_number: '', season_number: '1',
   })
   const [videoFile, setVideoFile] = useState(null)
@@ -55,7 +61,7 @@ function UploadForm({ seriesList, onSuccess }) {
       await uploadVideo(fd)
       setProgress('')
       onSuccess()
-      setForm({ title: '', description: '', genre: GENRES[0], series_id: '', episode_number: '', season_number: '1' })
+      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], series_id: '', episode_number: '', season_number: '1' })
       setVideoFile(null)
       setThumbFile(null)
     } catch (err) {
@@ -80,6 +86,12 @@ function UploadForm({ seriesList, onSuccess }) {
           <label className="form-label">Genre *</label>
           <select className="form-input" value={form.genre} onChange={e => set('genre', e.target.value)}>
             {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Language *</label>
+          <select className="form-input" value={form.language} onChange={e => set('language', e.target.value)}>
+            {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
       </div>
@@ -130,7 +142,7 @@ function UploadForm({ seriesList, onSuccess }) {
 }
 
 function SeriesForm({ onSuccess }) {
-  const [form, setForm] = useState({ title: '', description: '', genre: GENRES[0] })
+  const [form, setForm] = useState({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0] })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -142,7 +154,7 @@ function SeriesForm({ onSuccess }) {
     setLoading(true)
     try {
       await createSeries(form)
-      setForm({ title: '', description: '', genre: GENRES[0] })
+      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0] })
       onSuccess()
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create series.')
@@ -163,6 +175,12 @@ function SeriesForm({ onSuccess }) {
           <label className="form-label">Genre *</label>
           <select className="form-input" value={form.genre} onChange={e => set('genre', e.target.value)}>
             {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Language *</label>
+          <select className="form-input" value={form.language} onChange={e => set('language', e.target.value)}>
+            {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
         </div>
       </div>

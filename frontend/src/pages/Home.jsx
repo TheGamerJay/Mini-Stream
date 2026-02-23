@@ -13,6 +13,7 @@ const GENRES = [
   'Slice of Life', 'Mecha', 'Isekai', 'Historical', 'Seinen', 'Shojo', 'Shonen',
   'Experimental',
 ]
+const LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
 
 export default function Home() {
   const { user } = useAuth()
@@ -21,6 +22,7 @@ export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [activeGenre, setActiveGenre] = useState(searchParams.get('genre') || '')
+  const [activeLanguage, setActiveLanguage] = useState(searchParams.get('language') || '')
   const [searchResults, setSearchResults] = useState(null)
   const [searching, setSearching] = useState(false)
 
@@ -31,11 +33,11 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  const doSearch = async (q, genre) => {
-    if (!q && !genre) { setSearchResults(null); return }
+  const doSearch = async (q, genre, language) => {
+    if (!q && !genre && !language) { setSearchResults(null); return }
     setSearching(true)
     try {
-      const { data } = await searchApi({ q, genre })
+      const { data } = await searchApi({ q, genre, language })
       setSearchResults(data)
     } catch (err) {
       console.error(err)
@@ -44,23 +46,33 @@ export default function Home() {
     }
   }
 
+  const buildParams = (q, genre, language) => {
+    const p = {}
+    if (q) p.q = q
+    if (genre) p.genre = genre
+    if (language) p.language = language
+    return p
+  }
+
   const handleSearch = (e) => {
     e.preventDefault()
-    const params = {}
-    if (searchQuery) params.q = searchQuery
-    if (activeGenre) params.genre = activeGenre
+    const params = buildParams(searchQuery, activeGenre, activeLanguage)
     setSearchParams(params)
-    doSearch(searchQuery, activeGenre)
+    doSearch(searchQuery, activeGenre, activeLanguage)
   }
 
   const handleGenre = (genre) => {
     const newGenre = activeGenre === genre ? '' : genre
     setActiveGenre(newGenre)
-    const params = {}
-    if (searchQuery) params.q = searchQuery
-    if (newGenre) params.genre = newGenre
-    setSearchParams(params)
-    doSearch(searchQuery, newGenre)
+    setSearchParams(buildParams(searchQuery, newGenre, activeLanguage))
+    doSearch(searchQuery, newGenre, activeLanguage)
+  }
+
+  const handleLanguage = (lang) => {
+    const newLang = activeLanguage === lang ? '' : lang
+    setActiveLanguage(newLang)
+    setSearchParams(buildParams(searchQuery, activeGenre, newLang))
+    doSearch(searchQuery, activeGenre, newLang)
   }
 
   if (loading) return <div className="page-loader"><div className="spinner" /></div>
@@ -103,6 +115,18 @@ export default function Home() {
               </button>
             ))}
           </div>
+          <div className="language-filter">
+            <span className="filter-label">Language:</span>
+            {LANGUAGES.map((l) => (
+              <button
+                key={l}
+                className={`genre-pill${activeLanguage === l ? ' active' : ''}`}
+                onClick={() => handleLanguage(l)}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Search Results */}
@@ -110,7 +134,7 @@ export default function Home() {
           <div className="search-results fade-in">
             <div className="search-results__header">
               <h2>Results {searchQuery && `for "${searchQuery}"`} {activeGenre && `· ${activeGenre}`}</h2>
-              <button className="btn btn-ghost" onClick={() => { setSearchResults(null); setSearchQuery(''); setActiveGenre(''); setSearchParams({}); }}>
+              <button className="btn btn-ghost" onClick={() => { setSearchResults(null); setSearchQuery(''); setActiveGenre(''); setActiveLanguage(''); setSearchParams({}); }}>
                 Clear
               </button>
             </div>
