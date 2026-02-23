@@ -55,10 +55,7 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <>
-              <Link to="/login" className="btn btn-ghost">Sign In</Link>
-              <Link to="/signup" className="btn btn-primary">Get Started</Link>
-            </>
+            <Link to="/login" className="btn btn-ghost">Sign In</Link>
           )}
         </div>
       </div>
