@@ -8,6 +8,7 @@
   background: rgba(9, 9, 14, 0.95);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 }
 
 .navbar__inner {

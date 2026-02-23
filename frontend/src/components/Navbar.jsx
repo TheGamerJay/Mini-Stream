@@ -57,7 +57,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link to="/login" className="btn btn-ghost">Sign In</Link>
-              <span className="btn btn-primary" style={{ opacity: 0.45, cursor: 'default', pointerEvents: 'none' }}>Get Started</span>
+              <Link to="/signup" className="btn btn-primary">Get Started</Link>
             </>
           )}
         </div>
