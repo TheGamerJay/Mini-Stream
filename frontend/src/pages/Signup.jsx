@@ -9,6 +9,7 @@ export default function Signup() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ display_name: '', email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
+  const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -19,6 +20,10 @@ export default function Signup() {
     setError('')
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters.')
+      return
+    }
+    if (!agreed) {
+      setError('You must agree to the Terms of Service and Privacy Policy.')
       return
     }
     setLoading(true)
@@ -91,16 +96,24 @@ export default function Signup() {
               </button>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
+
+          <label className="terms-checkbox">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+            />
+            <span>
+              I have read and agree to the{' '}
+              <Link to="/terms" target="_blank">Terms of Service</Link> and{' '}
+              <Link to="/privacy" target="_blank">Privacy Policy</Link>
+            </span>
+          </label>
+
+          <button type="submit" className="btn btn-primary auth-submit" disabled={loading || !agreed}>
             {loading ? <span className="spinner spinner-sm" /> : 'Create Account'}
           </button>
         </form>
-
-        <p className="auth-terms">
-          By signing up you agree to our{' '}
-          <Link to="/terms">Terms of Service</Link> and{' '}
-          <Link to="/privacy">Privacy Policy</Link>.
-        </p>
 
         <div className="auth-footer">
           Already have an account? <Link to="/login">Sign in</Link>
