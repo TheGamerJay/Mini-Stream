@@ -108,15 +108,47 @@ function AdminLogin({ onLogin }) {
 // ── Overview tab ──────────────────────────────────────────────────────────────
 function OverviewTab({ token }) {
   const [stats, setStats] = useState(null)
+  const [seeding, setSeeding] = useState(false)
+  const [seedMsg, setSeedMsg] = useState('')
 
   useEffect(() => {
     adminFetch('/stats', token).then(setStats)
   }, [token])
 
+  const handleSeed = async () => {
+    setSeeding(true)
+    setSeedMsg('')
+    const res = await adminFetch('/seed-demo', token, { method: 'POST' })
+    setSeedMsg(res.message || 'Done')
+    const fresh = await adminFetch('/stats', token)
+    setStats(fresh)
+    setSeeding(false)
+  }
+
+  const handleClearSeed = async () => {
+    if (!window.confirm('Remove all demo data?')) return
+    setSeeding(true)
+    setSeedMsg('')
+    const res = await adminFetch('/seed-demo', token, { method: 'DELETE' })
+    setSeedMsg(res.message || 'Cleared')
+    const fresh = await adminFetch('/stats', token)
+    setStats(fresh)
+    setSeeding(false)
+  }
+
   if (!stats) return <div className="admin-loading">Loading…</div>
 
   return (
     <div>
+      <div className="admin-seed-row">
+        <button className="admin-seed-btn" onClick={handleSeed} disabled={seeding}>
+          {seeding ? 'Working…' : 'Seed Demo Data'}
+        </button>
+        <button className="admin-seed-btn admin-seed-btn--danger" onClick={handleClearSeed} disabled={seeding}>
+          Clear Demo Data
+        </button>
+        {seedMsg && <span className="admin-seed-msg">{seedMsg}</span>}
+      </div>
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
           <div className="stat-label">Total Users</div>

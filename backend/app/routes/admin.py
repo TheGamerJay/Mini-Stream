@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify
 from functools import wraps
-from .. import db
+from .. import db, bcrypt
 from ..models.user import User
 from ..models.video import Video
 from ..models.series import Series
@@ -180,3 +180,174 @@ def admin_delete_video(video_id):
     db.session.delete(video)
     db.session.commit()
     return jsonify({'message': 'Video deleted'})
+
+
+# ── Demo seed / clear ─────────────────────────────────────────────────────────
+
+_DEMO_EMAILS = [
+    'demo_creator1@ministream.dev',
+    'demo_creator2@ministream.dev',
+    'demo_creator3@ministream.dev',
+]
+
+_DEMO_VIDS = [
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+]
+
+def _thumb(seed):
+    return f'https://picsum.photos/seed/{seed}/480/270'
+
+def _vurl(i):
+    return _DEMO_VIDS[i % len(_DEMO_VIDS)]
+
+_DEMO_SERIES = [
+    {
+        'ci': 0, 'title': 'Shadow Realm Chronicles', 'genre': 'Fantasy', 'language': 'English',
+        'rating': 'Mature', 'thumb': _thumb('shadow_realm'),
+        'desc': 'A dark fantasy epic following a cursed warrior navigating a world where shadows are alive.',
+        'episodes': [
+            ('The Cursed Blade', 'Kira discovers an ancient sword that bonds to her soul.', 1),
+            ('City of Echoes', 'The journey begins through a city that whispers secrets.', 2),
+            ('The Hollow King', 'A forgotten ruler awakens from centuries of slumber.', 3),
+            ('Blood Pact', 'Kira must forge an alliance with her greatest enemy.', 4),
+        ],
+    },
+    {
+        'ci': 0, 'title': 'Cafe Soleil', 'genre': 'Slice of Life', 'language': 'English',
+        'rating': 'General', 'thumb': _thumb('cafe_soleil'),
+        'desc': 'A warm series about the staff and regulars of a small seaside café.',
+        'episodes': [
+            ('Opening Day', 'The café opens its doors for the first time.', 1),
+            ('The Regular', 'A mysterious customer orders the same thing every day.', 2),
+            ('Rainy Season', 'A storm keeps the crew stuck inside together.', 3),
+        ],
+    },
+    {
+        'ci': 1, 'title': 'Neon Drift', 'genre': 'Action', 'language': 'English',
+        'rating': 'Mature', 'thumb': _thumb('neon_drift'),
+        'desc': 'Underground street racers in a cyberpunk megacity fight for territory and survival.',
+        'episodes': [
+            ('Zero to Sixty', 'Ryo enters his first illegal street race.', 1),
+            ('Burning Chrome', 'A rival crew torches the garage — payback is coming.', 2),
+            ('Ghost Lane', "The city's most dangerous road opens at midnight.", 3),
+            ('Final Circuit', 'Winner takes the entire city grid.', 4),
+        ],
+    },
+    {
+        'ci': 1, 'title': 'The Mechanical Garden', 'genre': 'Sci-Fi', 'language': 'English',
+        'rating': 'General', 'thumb': _thumb('mech_garden'),
+        'desc': 'In a world run by clockwork automata, one girl befriends a broken-down robot gardener.',
+        'episodes': [
+            ('Rust and Petals', "Emilia finds Unit 7 half-buried in her grandmother's garden.", 1),
+            ('Winding Up', 'Getting Unit 7 running again requires parts that are hard to find.', 2),
+            ('Spring Protocol', "Unit 7 begins to develop routines that weren't in its code.", 3),
+        ],
+    },
+    {
+        'ci': 2, 'title': 'Phantom Signal', 'genre': 'Mystery', 'language': 'English',
+        'rating': 'General', 'thumb': _thumb('phantom_signal'),
+        'desc': 'A radio operator begins receiving transmissions from someone who died 30 years ago.',
+        'episodes': [
+            ('Dead Air', 'The first voice breaks through on a stormy night.', 1),
+            ('Frequency', 'The messages grow longer and more specific.', 2),
+            ('Static', 'Someone else is listening in.', 3),
+            ('Last Transmission', 'The truth behind the signal surfaces.', 4),
+        ],
+    },
+]
+
+_STANDALONE = [
+    (0, 'The Watcher (Short Film)', 'Horror', 'A lone security guard discovers something is watching him through the cameras.', 'Mature'),
+    (0, 'Bloom — An Animated Short', 'Experimental', 'A wordless meditation on growth, loss, and returning home.', 'General'),
+    (1, 'Midnight Ramen', 'Slice of Life', 'A chef finds unexpected company in his empty restaurant at 2AM.', 'General'),
+    (1, 'Steel and Sky', 'Action', 'A ronin takes a final job that forces her to face her past.', 'Mature'),
+    (2, 'Orbit', 'Sci-Fi', 'Two astronauts stranded in orbit must decide who comes home.', 'General'),
+    (2, 'The Last Library', 'Drama', 'A librarian refuses to leave the last standing building in a demolished city.', 'General'),
+    (0, 'Ghost Town Blues', 'Mystery', 'A detective wakes up in a town with no one left — but someone is still leaving notes.', 'General'),
+    (1, 'Paper Cranes', 'Romance', 'Two strangers exchange messages folded into origami cranes left at the same park bench.', 'General'),
+    (2, 'Red Mist', 'Horror', 'A mountain hiking trip goes wrong when the fog rolls in with something inside it.', 'Mature'),
+    (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'Mature'),
+    (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'General'),
+    (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'General'),
+]
+
+
+@admin_bp.route('/seed-demo', methods=['POST'])
+@require_admin
+def seed_demo():
+    existing = User.query.filter(User.email.in_(_DEMO_EMAILS)).first()
+    if existing:
+        return jsonify({'message': 'Demo data already seeded.'}), 200
+
+    pw = bcrypt.generate_password_hash('demo1234').decode('utf-8')
+    creators = []
+    for name, email in [('Aiko Studios', _DEMO_EMAILS[0]),
+                        ('NightOwl Animation', _DEMO_EMAILS[1]),
+                        ('PixelDrift Films', _DEMO_EMAILS[2])]:
+        u = User(email=email, display_name=name, password_hash=pw, is_creator=True)
+        db.session.add(u)
+        db.session.flush()
+        creators.append(u)
+
+    vi = 0
+    for s_data in _DEMO_SERIES:
+        c = creators[s_data['ci']]
+        s = Series(
+            creator_id=c.id, title=s_data['title'], description=s_data['desc'],
+            genre=s_data['genre'], language=s_data['language'],
+            content_rating=s_data['rating'], thumbnail_url=s_data['thumb'], is_published=True,
+        )
+        db.session.add(s)
+        db.session.flush()
+        for ep_title, ep_desc, ep_num in s_data['episodes']:
+            db.session.add(Video(
+                creator_id=c.id, series_id=s.id, title=ep_title, description=ep_desc,
+                genre=s_data['genre'], language=s_data['language'], video_type='Episode',
+                content_rating=s_data['rating'], video_url=_vurl(vi),
+                thumbnail_url=_thumb(f"ep{ep_num}_{s.id}"),
+                episode_number=ep_num, season_number=1,
+                duration=420 + ep_num * 180,
+                view_count=max(10, 600 - ep_num * 50 + vi * 11),
+                is_published=True,
+            ))
+            vi += 1
+
+    for i, (ci, title, genre, desc, rating) in enumerate(_STANDALONE):
+        c = creators[ci]
+        db.session.add(Video(
+            creator_id=c.id, title=title, description=desc,
+            genre=genre, language='English', video_type='Standalone',
+            content_rating=rating, video_url=_vurl(vi),
+            thumbnail_url=_thumb(f"solo{i}"),
+            duration=600 + i * 120, view_count=80 + i * 53,
+            is_published=True,
+        ))
+        vi += 1
+
+    db.session.commit()
+    return jsonify({'message': f'Seeded 3 creators, {len(_DEMO_SERIES)} series, {vi} videos.'})
+
+
+@admin_bp.route('/seed-demo', methods=['DELETE'])
+@require_admin
+def clear_demo():
+    users = User.query.filter(User.email.in_(_DEMO_EMAILS)).all()
+    if not users:
+        return jsonify({'message': 'No demo data found.'}), 200
+    for u in users:
+        for v in list(u.videos):
+            db.session.delete(v)
+        for s in list(u.series):
+            for ep in list(s.episodes):
+                db.session.delete(ep)
+            db.session.delete(s)
+        db.session.delete(u)
+    db.session.commit()
+    return jsonify({'message': 'Demo data cleared.'})
