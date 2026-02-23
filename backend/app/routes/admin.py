@@ -300,7 +300,7 @@ _STANDALONE = [
     (2, '8th Man — Pilot', 'Seinen',
      'A detective is killed in the line of duty and resurrected as a cybernetic superhero. Dark 1960s anime.',
      'Mature',
-     None),
+     'https://assets.mixkit.co/videos/18052/18052-720.mp4'),
     (0, 'Jungle Emperor — Episode 1', 'Shojo',
      'Kimba the white lion cub journeys from Africa to Japan in search of his destiny. Tezuka\'s classic 1965 anime.',
      'General',
