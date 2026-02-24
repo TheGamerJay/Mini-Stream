@@ -12,6 +12,8 @@ class User(db.Model):
     avatar_url = db.Column(db.String(500), nullable=True)
     bio = db.Column(db.Text, nullable=True)
     is_creator = db.Column(db.Boolean, default=False, nullable=False)
+    website = db.Column(db.String(255), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
     google_id = db.Column(db.String(255), unique=True, nullable=True)
     reset_token = db.Column(db.String(255), nullable=True)
     reset_token_expires = db.Column(db.DateTime, nullable=True)
@@ -31,6 +33,9 @@ class User(db.Model):
             'display_name': self.display_name,
             'avatar_url': self.avatar_url,
             'bio': self.bio,
+            'website': self.website,
+            'location': self.location,
             'is_creator': self.is_creator,
+            'has_password': self.password_hash is not None,
             'created_at': self.created_at.isoformat(),
         }

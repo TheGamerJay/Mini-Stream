@@ -146,6 +146,15 @@ def get_progress(video_id):
     return jsonify({'seconds': entry.progress_seconds if entry else 0})
 
 
+@videos_bp.route('/history', methods=['DELETE'])
+@jwt_required()
+def clear_history():
+    user_id = int(get_jwt_identity())
+    WatchHistory.query.filter_by(user_id=user_id).delete()
+    db.session.commit()
+    return jsonify({'message': 'History cleared'})
+
+
 @videos_bp.route('/<int:video_id>/report', methods=['POST'])
 def report_video(video_id):
     video = Video.query.get_or_404(video_id)

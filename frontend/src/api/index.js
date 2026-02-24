@@ -50,6 +50,9 @@ export const googleAuth = (token) => api.post('/auth/google', { token })
 export const getMe = () => api.get('/auth/me')
 export const becomeCreator = () => api.post('/auth/become-creator')
 export const updateProfile = (data) => api.put('/auth/profile', data)
+export const uploadAvatar = (formData) => api.post('/auth/avatar', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const changePassword = (data) => api.post('/auth/change-password', data)
+export const deleteAccount = () => api.delete('/auth/account')
 export const forgotPassword = (data) => api.post('/auth/forgot-password', data)
 export const resetPassword = (data) => api.post('/auth/reset-password', data)
 
@@ -69,6 +72,7 @@ export const saveProgress = (id, seconds) => api.post(`/videos/${id}/progress`, 
 export const getVideoProgress = (id) => api.get(`/videos/${id}/progress`)
 export const getContinueWatching = () => api.get('/videos/continue-watching')
 export const getHistory = () => api.get('/videos/history')
+export const clearHistory = () => api.delete('/videos/history')
 
 // Series
 export const getSeries = (id) => api.get(`/series/${id}`)

@@ -1,6 +1,7 @@
 import os
 import secrets
 import logging
+import cloudinary.uploader
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 
@@ -244,9 +245,81 @@ def update_profile():
         user.display_name = data['display_name'].strip()
     if data.get('bio') is not None:
         user.bio = data['bio']
+    if data.get('location') is not None:
+        user.location = data['location'].strip()[:100]
+    if data.get('website') is not None:
+        user.website = data['website'].strip()[:255]
 
     db.session.commit()
     return jsonify({'user': user.to_dict()})
+
+
+@auth_bp.route('/avatar', methods=['POST'])
+@jwt_required()
+def upload_avatar():
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    file = request.files.get('avatar')
+    if not file:
+        return jsonify({'error': 'No file provided'}), 400
+
+    try:
+        result = cloudinary.uploader.upload(
+            file,
+            folder='ministream/avatars',
+            public_id=str(user_id),
+            overwrite=True,
+            resource_type='image',
+            transformation=[{'width': 300, 'height': 300, 'crop': 'fill', 'gravity': 'face'}],
+        )
+        user.avatar_url = result['secure_url']
+        db.session.commit()
+        return jsonify({'avatar_url': user.avatar_url})
+    except Exception as e:
+        logger.error('Avatar upload failed for user %s: %s', user_id, e)
+        return jsonify({'error': 'Upload failed'}), 500
+
+
+@auth_bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    if not user or not user.password_hash:
+        return jsonify({'error': 'No password set for this account'}), 400
+
+    data = request.get_json() or {}
+    current = data.get('current_password', '')
+    new_pw = data.get('new_password', '')
+
+    if not bcrypt.check_password_hash(user.password_hash, current):
+        return jsonify({'error': 'Current password is incorrect'}), 400
+    if len(new_pw) < 8:
+        return jsonify({'error': 'New password must be at least 8 characters'}), 400
+
+    user.password_hash = bcrypt.generate_password_hash(new_pw).decode('utf-8')
+    db.session.commit()
+    return jsonify({'message': 'Password updated'})
+
+
+@auth_bp.route('/account', methods=['DELETE'])
+@jwt_required()
+def delete_account():
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    from ..models.watch_history import WatchHistory
+    from ..models.watch_later import WatchLater
+    WatchHistory.query.filter_by(user_id=user_id).delete()
+    WatchLater.query.filter_by(user_id=user_id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'Account deleted'})
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
