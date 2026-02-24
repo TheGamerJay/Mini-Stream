@@ -99,15 +99,20 @@ export default function Watch() {
   const handlePause = () => {
     clearInterval(progressIntervalRef.current)
     if (!videoRef.current) return
-    const seconds = Math.floor(videoRef.current.currentTime)
+    let seconds = Math.floor(videoRef.current.currentTime)
+    // If paused at >= 95% of DB duration, save as fully complete
+    if (video && video.duration > 0 && seconds / video.duration >= 0.95) {
+      seconds = video.duration
+    }
     if (seconds > 0) saveProgress(id, seconds).catch(() => {})
   }
 
   const handleEnded = () => {
     clearInterval(progressIntervalRef.current)
-    if (!videoRef.current) return
-    // Save as full duration so it registers as completed (>= 95%)
-    const seconds = Math.floor(videoRef.current.duration) || Math.floor(videoRef.current.currentTime)
+    // Use DB duration as source of truth so progress_pct = 100% guaranteed
+    const seconds = (video && video.duration > 0)
+      ? video.duration
+      : (Math.floor(videoRef.current?.duration) || Math.floor(videoRef.current?.currentTime) || 0)
     if (seconds > 0) saveProgress(id, seconds).catch(() => {})
   }
 
