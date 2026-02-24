@@ -103,6 +103,14 @@ export default function Watch() {
     if (seconds > 0) saveProgress(id, seconds).catch(() => {})
   }
 
+  const handleEnded = () => {
+    clearInterval(progressIntervalRef.current)
+    if (!videoRef.current) return
+    // Save as full duration so it registers as completed (>= 95%)
+    const seconds = Math.floor(videoRef.current.duration) || Math.floor(videoRef.current.currentTime)
+    if (seconds > 0) saveProgress(id, seconds).catch(() => {})
+  }
+
   const toggleSave = async () => {
     if (!user || saving) return
     setSaving(true)
@@ -162,6 +170,7 @@ export default function Watch() {
           onLoadedMetadata={handleLoadedMetadata}
           onPlay={handlePlay}
           onPause={handlePause}
+          onEnded={handleEnded}
         />
         {showResumeBanner && resumeSeconds > 0 && (
           <div className="watch-resume-banner">
