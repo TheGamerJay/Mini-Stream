@@ -224,7 +224,7 @@ export default function Profile() {
         <section className="profile-section">
           <h2 className="profile-section-heading">Watch Experience</h2>
           <div className="profile-card profile-card--flush">
-            <Link to="/home" className="profile-watch-link">
+            <Link to="/history?tab=progress" className="profile-watch-link">
               <span className="pwl-icon">▶</span>
               <div><p className="pwl-title">Continue Watching</p><p className="pwl-sub">Resume in-progress videos</p></div>
               <span className="pwl-chevron">›</span>
@@ -234,9 +234,9 @@ export default function Profile() {
               <div><p className="pwl-title">My List</p><p className="pwl-sub">Saved videos and series</p></div>
               <span className="pwl-chevron">›</span>
             </Link>
-            <Link to="/history" className="profile-watch-link">
+            <Link to="/history?tab=completed" className="profile-watch-link">
               <span className="pwl-icon">🕐</span>
-              <div><p className="pwl-title">Watch History</p><p className="pwl-sub">Everything you've watched</p></div>
+              <div><p className="pwl-title">Watch History</p><p className="pwl-sub">Videos you've finished</p></div>
               <span className="pwl-chevron">›</span>
             </Link>
             <div className="profile-clear-row">

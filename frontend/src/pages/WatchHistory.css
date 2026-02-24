@@ -1,7 +1,31 @@
 .history-page { padding: 100px 24px 60px; }
-.history-header { margin-bottom: 32px; }
-.history-header h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
-.history-header p { color: var(--text-muted); font-size: 0.9rem; }
+.history-header { margin-bottom: 20px; }
+.history-header h1 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; }
+
+/* Tabs */
+.history-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.history-tab-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+  margin-bottom: -1px;
+}
+.history-tab-btn:hover { color: var(--text-primary); }
+.history-tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
 .history-empty {
   text-align: center;
   padding: 80px 0;
@@ -12,3 +36,12 @@
 }
 .history-empty p { color: var(--text-muted); }
 .history-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+
+/* Responsive */
+@media (max-width: 540px) {
+  .history-page { padding: 80px 16px 60px; }
+  .history-header h1 { font-size: 1.4rem; }
+  .history-tabs { gap: 0; }
+  .history-tab-btn { padding: 10px 16px; font-size: 0.85rem; flex: 1; text-align: center; }
+  .history-grid { gap: 14px; }
+}

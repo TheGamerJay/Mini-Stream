@@ -103,13 +103,22 @@ def save_progress(video_id):
 @jwt_required()
 def get_history():
     user_id = int(get_jwt_identity())
+    completed_only = request.args.get('completed') == 'true'
     items = (
         WatchHistory.query.filter_by(user_id=user_id)
         .order_by(WatchHistory.last_watched_at.desc())
-        .limit(50)
+        .limit(100)
         .all()
     )
-    return jsonify({'history': [item.to_dict() for item in items if item.to_dict()]})
+    results = []
+    for item in items:
+        d = item.to_dict()
+        if not d:
+            continue
+        if completed_only and d.get('progress_pct', 0) < 95:
+            continue
+        results.append(d)
+    return jsonify({'history': results[:50]})
 
 
 @videos_bp.route('/continue-watching', methods=['GET'])
