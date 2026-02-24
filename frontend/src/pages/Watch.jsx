@@ -27,6 +27,9 @@ export default function Watch() {
   const videoRef = useRef(null)
   const progressIntervalRef = useRef(null)
   const savedSecondsRef = useRef(0)
+  const metadataReadyRef = useRef(false)
+  const [resumeSeconds, setResumeSeconds] = useState(0)
+  const [showResumeBanner, setShowResumeBanner] = useState(false)
 
   // Report modal state
   const [reportOpen, setReportOpen] = useState(false)
@@ -39,12 +42,26 @@ export default function Watch() {
     setLoading(true)
     setError('')
     savedSecondsRef.current = 0
+    metadataReadyRef.current = false
+    setResumeSeconds(0)
+    setShowResumeBanner(false)
     getVideo(id)
       .then(({ data }) => {
         setVideo(data.video)
         if (user) {
           getWatchLaterStatus(id).then(({ data: s }) => setSaved(s.saved)).catch(() => {})
-          getVideoProgress(id).then(({ data: p }) => { savedSecondsRef.current = p.seconds || 0 }).catch(() => {})
+          getVideoProgress(id).then(({ data: p }) => {
+            const secs = p.seconds || 0
+            savedSecondsRef.current = secs
+            if (secs > 0) {
+              setResumeSeconds(secs)
+              setShowResumeBanner(true)
+              // If metadata already loaded before this resolved, seek now
+              if (metadataReadyRef.current && videoRef.current) {
+                videoRef.current.currentTime = secs
+              }
+            }
+          }).catch(() => {})
         }
       })
       .catch(() => setError('Video not found or unavailable.'))
@@ -63,12 +80,14 @@ export default function Watch() {
   }, [id])
 
   const handleLoadedMetadata = () => {
-    if (savedSecondsRef.current > 5 && videoRef.current) {
+    metadataReadyRef.current = true
+    if (savedSecondsRef.current > 0 && videoRef.current) {
       videoRef.current.currentTime = savedSecondsRef.current
     }
   }
 
   const handlePlay = () => {
+    setShowResumeBanner(false)
     clearInterval(progressIntervalRef.current)
     progressIntervalRef.current = setInterval(() => {
       if (!videoRef.current) return
@@ -118,6 +137,14 @@ export default function Watch() {
     setReportNotes('')
   }
 
+  const fmtTime = (s) => {
+    const h = Math.floor(s / 3600)
+    const m = Math.floor((s % 3600) / 60)
+    const sec = s % 60
+    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+    return `${m}:${String(sec).padStart(2,'0')}`
+  }
+
   if (loading) return <div className="page-loader"><div className="spinner" /></div>
   if (error) return <div className="watch-error container"><p>{error}</p><Link to="/home" className="btn btn-ghost">Back to Home</Link></div>
   if (!video) return null
@@ -136,6 +163,21 @@ export default function Watch() {
           onPlay={handlePlay}
           onPause={handlePause}
         />
+        {showResumeBanner && resumeSeconds > 0 && (
+          <div className="watch-resume-banner">
+            <span>Resuming from {fmtTime(resumeSeconds)}</span>
+            <button
+              className="watch-resume-restart"
+              onClick={() => {
+                if (videoRef.current) videoRef.current.currentTime = 0
+                savedSecondsRef.current = 0
+                setShowResumeBanner(false)
+              }}
+            >
+              Start over
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="container watch-body">
