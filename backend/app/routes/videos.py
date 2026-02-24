@@ -125,7 +125,7 @@ def get_history():
 @jwt_required()
 def continue_watching():
     user_id = int(get_jwt_identity())
-    # Videos with progress between 5% and 95%
+    # Videos with any progress that aren't fully completed (< 95%)
     items = (
         WatchHistory.query
         .join(Video, WatchHistory.video_id == Video.id)
@@ -142,7 +142,7 @@ def continue_watching():
     results = []
     for item in items:
         d = item.to_dict()
-        if d and 5 <= d.get('progress_pct', 0) <= 95:
+        if d and 0 < d.get('progress_pct', 0) < 95:
             results.append(d)
     return jsonify({'continue_watching': results})
 
