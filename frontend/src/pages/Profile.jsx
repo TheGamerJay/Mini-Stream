@@ -262,10 +262,13 @@ export default function Profile() {
                   <p className="profile-pref-label">Autoplay Next Episode</p>
                   <p className="profile-pref-sub">Automatically play the next episode when one ends</p>
                 </div>
-                <button className={`profile-toggle${prefs.autoplay ? ' profile-toggle--on' : ''}`}
-                  onClick={() => setPref('autoplay', !prefs.autoplay)}>
-                  <span className="profile-toggle-knob" />
-                </button>
+                <div className="profile-toggle-wrap">
+                  <span className="profile-toggle-label">{prefs.autoplay ? 'On' : 'Off'}</span>
+                  <button className={`profile-toggle${prefs.autoplay ? ' profile-toggle--on' : ''}`}
+                    onClick={() => setPref('autoplay', !prefs.autoplay)}>
+                    <span className="profile-toggle-knob" />
+                  </button>
+                </div>
               </div>
 
               <div className="profile-pref-row">
@@ -299,10 +302,13 @@ export default function Profile() {
                   <p className="profile-pref-label">Mature Content</p>
                   <p className="profile-pref-sub">Show TV-MA and R-rated content</p>
                 </div>
-                <button className={`profile-toggle${prefs.mature_content ? ' profile-toggle--on' : ''}`}
-                  onClick={() => setPref('mature_content', !prefs.mature_content)}>
-                  <span className="profile-toggle-knob" />
-                </button>
+                <div className="profile-toggle-wrap">
+                  <span className="profile-toggle-label">{prefs.mature_content ? 'On' : 'Off'}</span>
+                  <button className={`profile-toggle${prefs.mature_content ? ' profile-toggle--on' : ''}`}
+                    onClick={() => setPref('mature_content', !prefs.mature_content)}>
+                    <span className="profile-toggle-knob" />
+                  </button>
+                </div>
               </div>
 
             </div>

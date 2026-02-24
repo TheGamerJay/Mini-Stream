@@ -57,7 +57,7 @@
   border: 2px solid rgba(0,212,255,0.3);
   position: relative;
 }
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: contain; }
 .profile-avatar--editable { cursor: pointer; }
 .profile-avatar--editable:hover .profile-avatar-overlay { opacity: 1; }
 .profile-avatar--loading { cursor: default; }
@@ -216,6 +216,18 @@
   display: block;
 }
 .profile-toggle--on .profile-toggle-knob { transform: translateX(20px); }
+
+.profile-toggle-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.profile-toggle-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  min-width: 22px;
+  text-align: right;
+  transition: color 0.2s;
+}
+.profile-toggle-wrap:has(.profile-toggle--on) .profile-toggle-label { color: var(--cyan); }
 
 /* Segmented control */
 .profile-seg {

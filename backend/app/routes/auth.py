@@ -273,7 +273,6 @@ def upload_avatar():
             public_id=str(user_id),
             overwrite=True,
             resource_type='image',
-            transformation=[{'width': 300, 'height': 300, 'crop': 'fill', 'gravity': 'face'}],
         )
         user.avatar_url = result['secure_url']
         db.session.commit()
