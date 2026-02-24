@@ -45,7 +45,7 @@
 .profile-avatar {
   width: 88px;
   height: 88px;
-  border-radius: 50%;
+  border-radius: 18px;
   background: var(--gradient);
   display: flex;
   align-items: center;
@@ -64,7 +64,7 @@
 .profile-avatar-overlay {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
+  border-radius: 18px;
   background: rgba(0,0,0,0.6);
   display: flex;
   align-items: center;
