@@ -44,7 +44,7 @@
 }
 .profile-avatar {
   width: 88px;
-  height: 88px;
+  height: 110px;
   border-radius: 18px;
   background: var(--gradient);
   display: flex;
