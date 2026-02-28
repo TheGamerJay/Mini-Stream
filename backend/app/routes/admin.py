@@ -205,16 +205,15 @@ _DEMO_EMAILS = [
 ]
 
 _DEMO_VIDS = [
-    # Blender open short films (animated, royalty-free)
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    # Mixkit 3D/animation clips (royalty-free, no auth needed)
-    'https://assets.mixkit.co/videos/31549/31549-720.mp4',   # flying into a black hole
-    'https://assets.mixkit.co/videos/14540/14540-720.mp4',   # flying across rocky planet
-    'https://assets.mixkit.co/videos/32941/32941-720.mp4',   # exploring flowery gardens
-    'https://assets.mixkit.co/videos/34041/34041-720.mp4',   # man on mountain at sunset
-    'https://assets.mixkit.co/videos/18052/18052-720.mp4',   # particle explosion / fire
-    'https://assets.mixkit.co/videos/32953/32953-720.mp4',   # dark creepy graveyard
+    # Blender Open Movies (CC BY) — used as rotating episode placeholder videos
+    'https://archive.org/download/BigBuckBunnyFULLHD60FPS/Big%20Buck%20Bunny%20-%20FULL%20HD%2060FPS.mp4',
+    'https://archive.org/download/ElephantsDream/ed_hd.mp4',
+    'https://archive.org/download/Sintel/sintel-2048-stereo.mp4',
+    'https://archive.org/download/Tears-of-Steel/tears_of_steel_1080p.mp4',
+    'https://archive.org/download/CosmosLaundromatFirstCycle/Cosmos%20Laundromat%20-%20First%20Cycle%20%281080p%29.mp4',
+    'https://archive.org/download/Caminandes2GranDillama/02_gran_dillama_1080p.mp4',
+    'https://archive.org/download/coffee_202209/coffee.mp4',
+    'https://archive.org/download/sprite-fright/Sprite%20Fright%20-%20Open%20Movie%20by%20Blender%20Studio-804p.mp4',
 ]
 
 def _thumb(seed):
@@ -320,6 +319,39 @@ _STANDALONE = [
 ]
 
 
+# Blender Open Movies + historic anime feature — seeded as video_type='Movie'
+# (ci, title, genre, description, rating, url, language, duration_seconds)
+_MOVIES = [
+    (0, 'Big Buck Bunny', 'Animation',
+     'A large, lovable rabbit lives peacefully in a meadow until three bullying rodents try to ruin his day. Blender Foundation open movie. (CC BY 3.0)',
+     'TV-G', 'https://archive.org/download/BigBuckBunnyFULLHD60FPS/Big%20Buck%20Bunny%20-%20FULL%20HD%2060FPS.mp4', 'English', 596),
+    (1, 'Elephants Dream', 'Experimental',
+     "The first Blender open movie — a surreal, dreamlike journey through a mechanical world experienced by two strangers. (CC BY 3.0)",
+     'TV-G', 'https://archive.org/download/ElephantsDream/ed_hd.mp4', 'English', 654),
+    (2, 'Sintel', 'Fantasy',
+     "A young woman crosses a dangerous world searching for her lost dragon companion. Blender Foundation's third open movie. (CC BY 3.0)",
+     'TV-PG', 'https://archive.org/download/Sintel/sintel-2048-stereo.mp4', 'English', 888),
+    (0, 'Tears of Steel', 'Sci-Fi',
+     "Blender's first live-action/CGI hybrid open movie. Warriors and machines clash in a crumbling future city. (CC BY 3.0)",
+     'TV-14', 'https://archive.org/download/Tears-of-Steel/tears_of_steel_1080p.mp4', 'English', 734),
+    (1, 'Cosmos Laundromat: First Cycle', 'Fantasy',
+     'A sheep on the verge of ending it all meets a mysterious stranger who offers him something remarkable. Blender Foundation open movie. (CC BY 4.0)',
+     'TV-PG', 'https://archive.org/download/CosmosLaundromatFirstCycle/Cosmos%20Laundromat%20-%20First%20Cycle%20%281080p%29.mp4', 'English', 720),
+    (2, 'Caminandes: Gran Dillama', 'Animation',
+     'Koro the llama faces off against a stubborn cactus in a hilarious Patagonian wilderness short. Blender open movie. (CC BY 3.0)',
+     'TV-G', 'https://archive.org/download/Caminandes2GranDillama/02_gran_dillama_1080p.mp4', 'English', 150),
+    (0, 'Coffee Run', 'Drama',
+     'A woman sprints through a rainy city in a desperate race against time — all for a cup of coffee. Blender Studio short film. (CC BY 4.0)',
+     'TV-G', 'https://archive.org/download/coffee_202209/coffee.mp4', 'English', 185),
+    (1, 'Sprite Fright', 'Horror',
+     'A group of city friends trespassing in an enchanted forest get far more than they bargained for. Blender Studio open movie. (CC BY 4.0)',
+     'TV-14', 'https://archive.org/download/sprite-fright/Sprite%20Fright%20-%20Open%20Movie%20by%20Blender%20Studio-804p.mp4', 'English', 480),
+    (2, 'Momotaro: Sacred Sailors', 'Anime',
+     "Japan's first feature-length anime film (1945). Commander Momotaro leads animal soldiers on a mission across the Pacific. A landmark of animation history. (Public Domain)",
+     'TV-PG', 'https://archive.org/download/momotaro-umi-no-shinpei-1945/Momotar%C3%B4%20Umi%20no%20shinpei%20%281945%29.mp4', 'Japanese', 4440),
+]
+
+
 @admin_bp.route('/seed-demo', methods=['POST'])
 @require_admin
 def seed_demo():
@@ -374,8 +406,19 @@ def seed_demo():
         ))
         vi += 1
 
+    for i, (ci, title, genre, desc, rating, url, lang, dur) in enumerate(_MOVIES):
+        c = creators[ci]
+        db.session.add(Video(
+            creator_id=c.id, title=title, description=desc,
+            genre=genre, language=lang, video_type='Movie',
+            content_rating=rating, video_url=url,
+            thumbnail_url=_thumb(f"movie{i}"),
+            duration=dur, view_count=300 + i * 97,
+            is_published=True,
+        ))
+
     db.session.commit()
-    return jsonify({'message': f'Seeded 3 creators, {len(_DEMO_SERIES)} series, {vi} videos.'})
+    return jsonify({'message': f'Seeded 3 creators, {len(_DEMO_SERIES)} series, {vi} videos, {len(_MOVIES)} movies.'})
 
 
 @admin_bp.route('/seed-demo', methods=['DELETE'])
