@@ -41,7 +41,7 @@ function PublicOnlyRoute({ children }) {
 
 function AppRoutes() {
   const location = useLocation()
-  const isAdmin = location.pathname === '/Admin'
+  const isAdmin = location.pathname.toLowerCase() === '/admin'
 
   if (isAdmin) {
     return <Admin />
