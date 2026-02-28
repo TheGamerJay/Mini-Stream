@@ -276,6 +276,39 @@ _DEMO_SERIES = [
             ('Last Transmission', 'The truth behind the signal surfaces.', 4),
         ],
     },
+    {
+        'ci': 2, 'title': 'Iron Sentinel', 'genre': 'Mecha', 'language': 'English',
+        'rating': 'TV-14', 'thumb': _thumb('iron_sentinel'),
+        'desc': 'Sixteen-year-old Kai pilots a decommissioned battle mech to defend his city after the military abandons it.',
+        'episodes': [
+            ('Cold Start', 'Kai reactivates Sentinel-7 in an underground junkyard.', 1),
+            ('First Contact', 'The first enemy unit crosses the border perimeter.', 2),
+            ('Reload', 'A weapons engineer offers upgrades — but at a price.', 3),
+            ('Breach', 'A second, far larger unit appears on radar.', 4),
+        ],
+    },
+    {
+        'ci': 0, 'title': 'The Hollow House', 'genre': 'Supernatural', 'language': 'English',
+        'rating': 'TV-MA', 'thumb': _thumb('hollow_house'),
+        'desc': 'A family moves into an old farmhouse and slowly discovers the previous occupants never truly left.',
+        'episodes': [
+            ('Move-In Day', 'The boxes are barely unpacked when the lights begin to flicker.', 1),
+            ('The Scratching', "Something moves inside the walls every night at 3 AM.", 2),
+            ('Old Photographs', 'Family photos found in the attic show people no one recognizes.', 3),
+            ('Full Moon', 'The entity makes itself visible for the first time.', 4),
+        ],
+    },
+    {
+        'ci': 1, 'title': 'Dead Drop', 'genre': 'Thriller', 'language': 'English',
+        'rating': 'TV-14', 'thumb': _thumb('dead_drop'),
+        'desc': 'A courier who asks no questions picks up the wrong package — and now everyone wants it back.',
+        'episodes': [
+            ('The Package', 'A routine delivery turns into a 48-hour nightmare.', 1),
+            ('Burnt Contacts', 'Every person she tries to reach ends up dead.', 2),
+            ('Safe House', 'An offer of protection comes with strings attached.', 3),
+            ('The Exchange', 'She has one shot to end it on her own terms.', 4),
+        ],
+    },
 ]
 
 # Standalone entries: (creator_index, title, genre, description, rating, video_url_or_None)
@@ -316,6 +349,34 @@ _STANDALONE = [
     (0, 'Voltage', 'Action', 'An underground boxer discovers she can channel electricity — and someone wants to weaponize it.', 'TV-14', None),
     (1, 'The Cartographer', 'Adventure', 'A mapmaker is hired to chart a territory that no map has ever shown accurately.', 'TV-PG', None),
     (2, 'Soft Shutdown', 'Psychological', 'A therapist realizes her newest patient may not be entirely human.', 'TV-14', None),
+    # Mecha
+    (0, 'Tetsujin 28-go — Episode 1', 'Mecha',
+     "The original 1964 giant robot anime that inspired generations of mecha. Young Shotaro Kaneda takes control of his late father's remote-controlled robot, Tetsujin 28. (Public Domain)",
+     'TV-G',
+     'https://archive.org/download/tetsujin-28-birth/Tetsujin%2028%2001%20Chronicle%20of%20Life.mp4',
+     'Japanese'),
+    (1, 'Steel Colossus', 'Mecha', 'When the last functioning war-mech powers down mid-battle, its 15-year-old mechanic must finish the fight from the cockpit.', 'TV-14', None),
+    (2, 'Mech Graveyard', 'Mecha', 'Scavengers picking through a battlefield of downed mechs find one unit that is not as dead as it looks.', 'TV-PG', None),
+    # Supernatural
+    (1, 'White Zombie', 'Supernatural',
+     "Bela Lugosi stars in this 1932 public domain horror classic. A young woman is turned into a zombie by a Haitian voodoo master. One of cinema's earliest supernatural thrillers. (Public Domain)",
+     'NR',
+     'https://archive.org/download/WhiteZombie1932/WhiteZombie_512kb.mp4',
+     'English'),
+    (2, 'Vessel', 'Supernatural', 'An exorcist is called to a remote island where a fishing crew claims something came up in their nets.', 'TV-MA', None),
+    (0, 'The Fold', 'Supernatural', 'A physicist studying quantum anomalies begins receiving messages from a version of herself that no longer exists.', 'TV-14', None),
+    # Thriller
+    (0, 'D.O.A.', 'Thriller',
+     'A man reports his own murder to the police in this gripping 1950 film noir. He has been fatally poisoned and has only days to find his own killer. (Public Domain)',
+     'NR',
+     'https://archive.org/download/doa-1950/D.O.A.%20%281950%29.mp4',
+     'English'),
+    (1, 'Detour', 'Thriller',
+     "Edgar Ulmer's razor-sharp 1945 film noir. A hitchhiker falls into a deadly web of bad luck and an even worse femme fatale. Shot in six days and still a masterpiece. (Public Domain)",
+     'NR',
+     'https://archive.org/download/detour-1945/Detour%201945.mp4',
+     'English'),
+    (2, 'Witness', 'Thriller', 'A journalist who films a crime through her apartment window realizes the killer is watching her back.', 'TV-14', None),
 ]
 
 
