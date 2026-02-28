@@ -73,6 +73,9 @@ export const getVideoProgress = (id) => api.get(`/videos/${id}/progress`)
 export const getContinueWatching = () => api.get('/videos/continue-watching')
 export const getHistory = (params) => api.get('/videos/history', { params })
 export const clearHistory = () => api.delete('/videos/history')
+export const getReaction = (id) => api.get(`/videos/${id}/reaction`)
+export const setReaction = (id, reaction) => api.post(`/videos/${id}/reaction`, { reaction })
+export const getRelated = (id) => api.get(`/videos/${id}/related`)
 
 // Series
 export const getSeries = (id) => api.get(`/series/${id}`)

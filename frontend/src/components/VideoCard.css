@@ -63,6 +63,28 @@
   box-shadow: var(--glow-cyan);
 }
 
+.video-card__bookmark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  z-index: 2;
+}
+.video-card:hover .video-card__bookmark { opacity: 1; }
+.video-card__bookmark:hover { background: rgba(0,212,255,0.25); border-color: rgba(0,212,255,0.5); }
+.video-card__bookmark.bookmarked { opacity: 1; color: var(--cyan); background: rgba(0,212,255,0.15); border-color: rgba(0,212,255,0.4); }
+
 .video-card__rating {
   position: absolute;
   top: 8px;

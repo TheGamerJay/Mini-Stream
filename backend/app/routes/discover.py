@@ -44,6 +44,16 @@ def home():
         .all()
     )
 
+    movies = (
+        Video.query.filter(
+            Video.is_published == True,
+            Video.video_type.in_(['Movie', 'Movie Adaptation']),
+        )
+        .order_by(Video.view_count.desc())
+        .limit(20)
+        .all()
+    )
+
     featured_series_list = (
         Series.query.filter_by(is_published=True)
         .order_by(Series.created_at.desc())
@@ -68,6 +78,7 @@ def home():
         'new_episodes': [v.to_dict() for v in new_episodes],
         'recently_added': [v.to_dict() for v in recently_added],
         'featured_series': [s.to_dict() for s in featured_series_list],
+        'movies': [v.to_dict() for v in movies],
         'genres': genre_rows,
     })
 

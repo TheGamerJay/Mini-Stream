@@ -42,6 +42,7 @@ def upload_video():
     series_id = request.form.get('series_id', type=int)
     episode_number = request.form.get('episode_number', type=int)
     season_number = request.form.get('season_number', 1, type=int)
+    allow_sharing = request.form.get('allow_sharing', 'true').lower() != 'false'
 
     if not title or not genre or not description or not language:
         return jsonify({'error': 'Title, genre, language, and description are required'}), 400
@@ -86,6 +87,7 @@ def upload_video():
         duration=int(video_result.get('duration', 0) or 0),
         episode_number=episode_number,
         season_number=season_number,
+        allow_sharing=allow_sharing,
     )
     db.session.add(video)
     db.session.commit()
@@ -211,6 +213,8 @@ def update_video(video_id):
         video.episode_number = data['episode_number']
     if data.get('season_number') is not None:
         video.season_number = data['season_number']
+    if data.get('allow_sharing') is not None:
+        video.allow_sharing = bool(data['allow_sharing'])
 
     db.session.commit()
     return jsonify({'video': video.to_dict()})

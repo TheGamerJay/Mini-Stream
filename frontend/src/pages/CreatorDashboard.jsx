@@ -15,7 +15,7 @@ const GENRES = [
   'Experimental',
 ]
 const LANGUAGES = ['English', 'Spanish', 'Portuguese', 'French', 'German', 'Italian', 'Japanese']
-const VIDEO_TYPES = ['Standalone', 'Episode', 'Short / Clip', 'Trailer / Teaser', 'Announcement']
+const VIDEO_TYPES = ['Standalone', 'Episode', 'Movie', 'Movie Adaptation', 'Short / Clip', 'Trailer / Teaser', 'Announcement']
 const RATINGS = ['G', 'PG', 'PG-13', 'R', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'NR']
 
 function StatsBar({ stats }) {
@@ -41,7 +41,7 @@ function UploadForm({ seriesList, onSuccess }) {
   const [form, setForm] = useState({
     title: '', description: '', genre: GENRES[0], language: LANGUAGES[0],
     video_type: VIDEO_TYPES[0], content_rating: RATINGS[0],
-    series_id: '', episode_number: '', season_number: '1',
+    series_id: '', episode_number: '', season_number: '1', allow_sharing: true,
   })
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
@@ -58,14 +58,14 @@ function UploadForm({ seriesList, onSuccess }) {
     setUploading(true)
     setProgress('Uploading video...')
     const fd = new FormData()
-    Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v) })
+    Object.entries(form).forEach(([k, v]) => { if (v !== '' && v !== null) fd.append(k, v) })
     fd.append('video', videoFile)
     if (thumbFile) fd.append('thumbnail', thumbFile)
     try {
       await uploadVideo(fd)
       setProgress('')
       onSuccess()
-      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1' })
+      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1', allow_sharing: true })
       setVideoFile(null)
       setThumbFile(null)
     } catch (err) {
@@ -149,6 +149,21 @@ function UploadForm({ seriesList, onSuccess }) {
           <label className="form-label">Thumbnail (optional)</label>
           <input type="file" className="form-input file-input" accept="image/*" onChange={e => setThumbFile(e.target.files[0])} />
         </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+          <span>Allow Sharing</span>
+          <input
+            type="checkbox"
+            checked={form.allow_sharing}
+            onChange={e => set('allow_sharing', e.target.checked)}
+            style={{ width: '16px', height: '16px', accentColor: 'var(--cyan)', cursor: 'pointer' }}
+          />
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+            {form.allow_sharing ? 'Viewers can share this video' : 'Sharing disabled'}
+          </span>
+        </label>
       </div>
 
       <button type="submit" className="btn btn-primary upload-btn" disabled={uploading}>

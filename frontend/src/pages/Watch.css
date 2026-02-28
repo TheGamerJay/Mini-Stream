@@ -105,10 +105,9 @@
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
-.watch-save-btn {
-  font-size: 0.85rem;
-  padding: 8px 18px;
-}
+.watch-save-btn { font-size: 0.85rem; padding: 8px 18px; }
+.watch-share-btn { font-size: 0.85rem; padding: 8px 14px; }
+.watch-pip-btn { font-size: 0.85rem; padding: 8px 14px; }
 .watch-report-btn {
   font-size: 0.82rem;
   padding: 8px 14px;
@@ -116,6 +115,34 @@
   border-color: rgba(255,255,255,0.1);
 }
 .watch-report-btn:hover { color: #f87171; border-color: rgba(248,113,113,0.3); }
+
+/* Reactions */
+.watch-reactions { display: flex; gap: 6px; }
+.watch-react-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.watch-react-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.watch-react-btn.active-like { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: #34d399; }
+.watch-react-btn.active-dislike { background: rgba(248,113,113,0.12); border-color: rgba(248,113,113,0.35); color: #f87171; }
+
+/* Related videos */
+.watch-related { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+.watch-related .video-card { flex-direction: row; gap: 10px; }
+.watch-related .video-card__thumb { width: 120px; flex-shrink: 0; border-radius: 6px; height: 70px; }
+.watch-related .video-card__thumb img { border-radius: 6px; }
+.watch-related .video-card__title { font-size: 0.82rem; }
+.watch-related .video-card__meta { font-size: 0.75rem; }
 
 /* Report modal */
 .report-overlay {

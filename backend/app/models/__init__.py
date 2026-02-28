@@ -3,5 +3,6 @@ from .series import Series
 from .video import Video
 from .watch_later import WatchLater
 from .watch_history import WatchHistory
+from .reaction import Reaction
 
-__all__ = ['User', 'Series', 'Video', 'WatchLater', 'WatchHistory']
+__all__ = ['User', 'Series', 'Video', 'WatchLater', 'WatchHistory', 'Reaction']

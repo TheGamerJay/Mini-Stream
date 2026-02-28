@@ -225,6 +225,9 @@ export default function Home() {
               <HorizontalRow title="Continue Watching" items={continueWatching} type="video" />
             )}
             <HorizontalRow title="Trending Now" items={homeData?.trending} type="video" />
+            {homeData?.movies?.length > 0 && (
+              <HorizontalRow title="Movies" items={homeData.movies} type="video" />
+            )}
             <HorizontalRow title="New Episodes" items={homeData?.new_episodes} type="video" />
             <HorizontalRow title="Featured Series" items={homeData?.featured_series} type="series" />
             <HorizontalRow title="Recently Added" items={homeData?.recently_added} type="video" />

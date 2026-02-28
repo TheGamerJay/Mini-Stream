@@ -21,6 +21,7 @@ class Video(db.Model):
     cloudinary_public_id = db.Column(db.String(255), nullable=True)
 
     duration = db.Column(db.Integer, nullable=True)  # seconds
+    allow_sharing = db.Column(db.Boolean, default=True, nullable=False)
     episode_number = db.Column(db.Integer, nullable=True)
     season_number = db.Column(db.Integer, default=1)
 
@@ -38,6 +39,7 @@ class Video(db.Model):
     watch_history_entries = db.relationship(
         'WatchHistory', backref='video', lazy='dynamic'
     )
+    reactions = db.relationship('Reaction', backref='video', lazy='dynamic')
 
     def format_duration(self):
         if not self.duration:
@@ -69,5 +71,6 @@ class Video(db.Model):
             'season_number': self.season_number,
             'view_count': self.view_count,
             'is_published': self.is_published,
+            'allow_sharing': self.allow_sharing,
             'created_at': self.created_at.isoformat(),
         }

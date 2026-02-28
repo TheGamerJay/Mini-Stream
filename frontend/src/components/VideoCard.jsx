@@ -1,10 +1,37 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { addWatchLater, removeWatchLater } from '../api'
+import { useAuth } from '../context/AuthContext'
 import './VideoCard.css'
 
 export default function VideoCard({ item, type = 'video' }) {
   const isVideo = type === 'video'
-  const link = isVideo ? `/watch/${item.id}` : `/series/${item.id}`
+  const link = isVideo ? `/watch/${item.video_id ?? item.id}` : `/series/${item.id}`
   const thumbnail = item.thumbnail_url || item.banner_url || null
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  const [bookmarked, setBookmarked] = useState(false)
+  const [bookmarking, setBookmarking] = useState(false)
+
+  const handleBookmark = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!user) { navigate('/login'); return }
+    if (bookmarking) return
+    setBookmarking(true)
+    try {
+      if (bookmarked) {
+        await removeWatchLater(item.video_id ?? item.id)
+        setBookmarked(false)
+      } else {
+        await addWatchLater(item.video_id ?? item.id)
+        setBookmarked(true)
+      }
+    } catch { /* ignore */ } finally {
+      setBookmarking(false)
+    }
+  }
 
   return (
     <Link to={link} className="video-card">
@@ -25,6 +52,17 @@ export default function VideoCard({ item, type = 'video' }) {
             </svg>
           </div>
         </div>
+        {isVideo && (
+          <button
+            className={`video-card__bookmark${bookmarked ? ' bookmarked' : ''}`}
+            onClick={handleBookmark}
+            title={bookmarked ? 'Remove from list' : 'Save to Watch Later'}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" />
+            </svg>
+          </button>
+        )}
         {item.content_rating && (
           <span className="video-card__rating">{item.content_rating}</span>
         )}

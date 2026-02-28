@@ -7,6 +7,7 @@ from .. import db
 from ..models.video import Video
 from ..models.watch_later import WatchLater
 from ..models.watch_history import WatchHistory
+from ..models.reaction import Reaction
 
 logger = logging.getLogger(__name__)
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
@@ -162,6 +163,62 @@ def clear_history():
     WatchHistory.query.filter_by(user_id=user_id).delete()
     db.session.commit()
     return jsonify({'message': 'History cleared'})
+
+
+@videos_bp.route('/<int:video_id>/reaction', methods=['GET'])
+@jwt_required()
+def get_reaction(video_id):
+    user_id = int(get_jwt_identity())
+    Video.query.get_or_404(video_id)
+    likes = Reaction.query.filter_by(video_id=video_id, reaction='like').count()
+    dislikes = Reaction.query.filter_by(video_id=video_id, reaction='dislike').count()
+    mine = Reaction.query.filter_by(user_id=user_id, video_id=video_id).first()
+    return jsonify({'likes': likes, 'dislikes': dislikes, 'mine': mine.reaction if mine else None})
+
+
+@videos_bp.route('/<int:video_id>/reaction', methods=['POST'])
+@jwt_required()
+def set_reaction(video_id):
+    user_id = int(get_jwt_identity())
+    Video.query.get_or_404(video_id)
+    data = request.get_json() or {}
+    reaction_type = data.get('reaction')
+    if reaction_type not in ('like', 'dislike'):
+        return jsonify({'error': 'Invalid reaction'}), 400
+
+    existing = Reaction.query.filter_by(user_id=user_id, video_id=video_id).first()
+    if existing:
+        if existing.reaction == reaction_type:
+            # Toggle off — remove reaction
+            db.session.delete(existing)
+            db.session.commit()
+            likes = Reaction.query.filter_by(video_id=video_id, reaction='like').count()
+            dislikes = Reaction.query.filter_by(video_id=video_id, reaction='dislike').count()
+            return jsonify({'likes': likes, 'dislikes': dislikes, 'mine': None})
+        existing.reaction = reaction_type
+    else:
+        r = Reaction(user_id=user_id, video_id=video_id, reaction=reaction_type)
+        db.session.add(r)
+    db.session.commit()
+    likes = Reaction.query.filter_by(video_id=video_id, reaction='like').count()
+    dislikes = Reaction.query.filter_by(video_id=video_id, reaction='dislike').count()
+    return jsonify({'likes': likes, 'dislikes': dislikes, 'mine': reaction_type})
+
+
+@videos_bp.route('/<int:video_id>/related', methods=['GET'])
+def get_related(video_id):
+    video = Video.query.get_or_404(video_id)
+    related = (
+        Video.query.filter(
+            Video.is_published == True,
+            Video.id != video_id,
+            Video.genre == video.genre,
+        )
+        .order_by(Video.view_count.desc())
+        .limit(10)
+        .all()
+    )
+    return jsonify({'related': [v.to_dict() for v in related]})
 
 
 @videos_bp.route('/<int:video_id>/report', methods=['POST'])

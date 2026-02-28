@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress } from '../api'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated } from '../api'
 import { useAuth } from '../context/AuthContext'
 import VideoCard from '../components/VideoCard'
 import './Watch.css'
@@ -23,6 +23,11 @@ export default function Watch() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [seriesEpisodes, setSeriesEpisodes] = useState([])
+  const [reaction, setReactionState] = useState(null) // 'like' | 'dislike' | null
+  const [likes, setLikes] = useState(0)
+  const [dislikes, setDislikes] = useState(0)
+  const [related, setRelated] = useState([])
+  const [copied, setCopied] = useState(false)
 
   const videoRef = useRef(null)
   const progressIntervalRef = useRef(null)
@@ -48,8 +53,10 @@ export default function Watch() {
     getVideo(id)
       .then(({ data }) => {
         setVideo(data.video)
+        getRelated(id).then(({ data: r }) => setRelated(r.related || [])).catch(() => {})
         if (user) {
           getWatchLaterStatus(id).then(({ data: s }) => setSaved(s.saved)).catch(() => {})
+          getReaction(id).then(({ data: r }) => { setLikes(r.likes); setDislikes(r.dislikes); setReactionState(r.mine) }).catch(() => {})
           getVideoProgress(id).then(({ data: p }) => {
             const secs = p.seconds || 0
             savedSecondsRef.current = secs
@@ -115,6 +122,51 @@ export default function Watch() {
       : (Math.floor(videoRef.current?.duration) || Math.floor(videoRef.current?.currentTime) || 0)
     if (seconds > 0) saveProgress(id, seconds).catch(() => {})
   }
+
+  const handleReaction = useCallback(async (type) => {
+    if (!user) return
+    try {
+      const { data } = await setReaction(id, type)
+      setLikes(data.likes)
+      setDislikes(data.dislikes)
+      setReactionState(data.mine)
+    } catch { /* ignore */ }
+  }, [id, user])
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const handlePiP = async () => {
+    if (!videoRef.current) return
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture()
+      } else {
+        await videoRef.current.requestPictureInPicture()
+      }
+    } catch { /* browser may not support */ }
+  }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = e.target.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (!videoRef.current) return
+      const v = videoRef.current
+      if (e.code === 'Space') { e.preventDefault(); v.paused ? v.play() : v.pause() }
+      else if (e.code === 'ArrowRight') { e.preventDefault(); v.currentTime = Math.min(v.duration, v.currentTime + 10) }
+      else if (e.code === 'ArrowLeft') { e.preventDefault(); v.currentTime = Math.max(0, v.currentTime - 10) }
+      else if (e.code === 'KeyM') { v.muted = !v.muted }
+      else if (e.code === 'KeyF') { document.fullscreenElement ? document.exitFullscreen() : v.requestFullscreen() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const toggleSave = async () => {
     if (!user || saving) return
@@ -228,6 +280,27 @@ export default function Watch() {
           </div>
 
           <div className="watch-actions">
+            {/* Reactions */}
+            {user && (
+              <div className="watch-reactions">
+                <button
+                  className={`watch-react-btn${reaction === 'like' ? ' active-like' : ''}`}
+                  onClick={() => handleReaction('like')}
+                  title="Like"
+                >
+                  👍 <span>{likes}</span>
+                </button>
+                <button
+                  className={`watch-react-btn${reaction === 'dislike' ? ' active-dislike' : ''}`}
+                  onClick={() => handleReaction('dislike')}
+                  title="Dislike"
+                >
+                  🍅 <span>{dislikes}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Save */}
             {user && (
               <button
                 className={`btn watch-save-btn ${saved ? 'btn-outline-cyan' : 'btn-ghost'}`}
@@ -242,11 +315,24 @@ export default function Watch() {
                 ) : (
                   <>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 3a2 2 0 00-2 2v16l9-4 9 4V5a2 2 0 00-2-2H5z" /></svg>
-                    Save to Watch Later
+                    Save
                   </>
                 )}
               </button>
             )}
+
+            {/* Share */}
+            {video.allow_sharing && (
+              <button className="btn btn-ghost watch-share-btn" onClick={handleShare}>
+                {copied ? '✓ Copied!' : '⬆ Share'}
+              </button>
+            )}
+
+            {/* Picture-in-Picture */}
+            <button className="btn btn-ghost watch-pip-btn" onClick={handlePiP} title="Picture-in-Picture">
+              ⧉ PiP
+            </button>
+
             <button className="btn watch-report-btn" onClick={() => setReportOpen(true)}>
               Report
             </button>
@@ -260,15 +346,25 @@ export default function Watch() {
           )}
         </div>
 
-        {/* Episode sidebar if part of a series */}
-        {video.series_id && (
-          <div className="watch-sidebar">
-            <h3 className="sidebar-title">More from this Series</h3>
-            <Link to={`/series/${video.series_id}`} className="btn btn-ghost sidebar-series-btn">
-              View All Episodes
-            </Link>
-          </div>
-        )}
+        {/* Sidebar */}
+        <div className="watch-sidebar">
+          {video.series_id && (
+            <>
+              <h3 className="sidebar-title">More from this Series</h3>
+              <Link to={`/series/${video.series_id}`} className="btn btn-ghost sidebar-series-btn">
+                View All Episodes
+              </Link>
+            </>
+          )}
+          {related.length > 0 && (
+            <>
+              <h3 className="sidebar-title">Related Videos</h3>
+              <div className="watch-related">
+                {related.map((v) => <VideoCard key={v.id} item={v} type="video" />)}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Report modal */}
