@@ -22,6 +22,9 @@ class Video(db.Model):
 
     duration = db.Column(db.Integer, nullable=True)  # seconds
     allow_sharing = db.Column(db.Boolean, default=True, nullable=False)
+    intro_start = db.Column(db.Integer, nullable=True)  # seconds
+    intro_end = db.Column(db.Integer, nullable=True)    # seconds
+    recap_end = db.Column(db.Integer, nullable=True)    # seconds
     episode_number = db.Column(db.Integer, nullable=True)
     season_number = db.Column(db.Integer, default=1)
 
@@ -67,6 +70,9 @@ class Video(db.Model):
             'thumbnail_url': self.thumbnail_url,
             'duration': self.duration,
             'duration_formatted': self.format_duration(),
+            'intro_start': self.intro_start,
+            'intro_end': self.intro_end,
+            'recap_end': self.recap_end,
             'episode_number': self.episode_number,
             'season_number': self.season_number,
             'view_count': self.view_count,

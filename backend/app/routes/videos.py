@@ -221,6 +221,36 @@ def get_related(video_id):
     return jsonify({'related': [v.to_dict() for v in related]})
 
 
+@videos_bp.route('/<int:video_id>/next', methods=['GET'])
+def get_next_episode(video_id):
+    video = Video.query.get_or_404(video_id)
+    if not video.series_id or not video.episode_number:
+        return jsonify({'next': None})
+
+    # Try same season, next episode number
+    next_ep = (
+        Video.query.filter(
+            Video.series_id == video.series_id,
+            Video.is_published == True,
+            Video.season_number == (video.season_number or 1),
+            Video.episode_number == video.episode_number + 1,
+        ).first()
+    )
+
+    if not next_ep:
+        # Try first episode of next season
+        next_ep = (
+            Video.query.filter(
+                Video.series_id == video.series_id,
+                Video.is_published == True,
+                Video.season_number == (video.season_number or 1) + 1,
+                Video.episode_number == 1,
+            ).first()
+        )
+
+    return jsonify({'next': next_ep.to_dict() if next_ep else None})
+
+
 @videos_bp.route('/<int:video_id>/report', methods=['POST'])
 def report_video(video_id):
     video = Video.query.get_or_404(video_id)

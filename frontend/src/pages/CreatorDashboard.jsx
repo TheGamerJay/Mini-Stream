@@ -42,6 +42,7 @@ function UploadForm({ seriesList, onSuccess }) {
     title: '', description: '', genre: GENRES[0], language: LANGUAGES[0],
     video_type: VIDEO_TYPES[0], content_rating: RATINGS[0],
     series_id: '', episode_number: '', season_number: '1', allow_sharing: true,
+    intro_start: '', intro_end: '', recap_end: '',
   })
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
@@ -65,7 +66,7 @@ function UploadForm({ seriesList, onSuccess }) {
       await uploadVideo(fd)
       setProgress('')
       onSuccess()
-      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1', allow_sharing: true })
+      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1', allow_sharing: true, intro_start: '', intro_end: '', recap_end: '' })
       setVideoFile(null)
       setThumbFile(null)
     } catch (err) {
@@ -164,6 +165,26 @@ function UploadForm({ seriesList, onSuccess }) {
             {form.allow_sharing ? 'Viewers can share this video' : 'Sharing disabled'}
           </span>
         </label>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
+          Intro / Recap Timestamps <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional, in seconds)</span>
+        </label>
+        <div className="form-row" style={{ marginTop: 0 }}>
+          <div className="form-group">
+            <label className="form-label">Intro Start (s)</label>
+            <input type="number" className="form-input" value={form.intro_start} onChange={e => set('intro_start', e.target.value)} min="0" placeholder="e.g. 5" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Intro End (s)</label>
+            <input type="number" className="form-input" value={form.intro_end} onChange={e => set('intro_end', e.target.value)} min="0" placeholder="e.g. 90" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Recap End (s)</label>
+            <input type="number" className="form-input" value={form.recap_end} onChange={e => set('recap_end', e.target.value)} min="0" placeholder="e.g. 60" />
+          </div>
+        </div>
       </div>
 
       <button type="submit" className="btn btn-primary upload-btn" disabled={uploading}>

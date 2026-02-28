@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated } from '../api'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated, getNextEpisode } from '../api'
 import { useAuth } from '../context/AuthContext'
 import VideoCard from '../components/VideoCard'
 import './Watch.css'
@@ -17,6 +17,7 @@ const REPORT_REASONS = [
 export default function Watch() {
   const { id } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [video, setVideo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -28,6 +29,12 @@ export default function Watch() {
   const [dislikes, setDislikes] = useState(0)
   const [related, setRelated] = useState([])
   const [copied, setCopied] = useState(false)
+  const [nextEpisode, setNextEpisode] = useState(null)
+  const [showSkipIntro, setShowSkipIntro] = useState(false)
+  const [showSkipRecap, setShowSkipRecap] = useState(false)
+  const [showNextOverlay, setShowNextOverlay] = useState(false)
+  const [nextCountdown, setNextCountdown] = useState(5)
+  const nextCountdownRef = useRef(null)
 
   const videoRef = useRef(null)
   const progressIntervalRef = useRef(null)
@@ -50,10 +57,16 @@ export default function Watch() {
     metadataReadyRef.current = false
     setResumeSeconds(0)
     setShowResumeBanner(false)
+    setShowNextOverlay(false)
+    setNextEpisode(null)
+    clearInterval(nextCountdownRef.current)
     getVideo(id)
       .then(({ data }) => {
         setVideo(data.video)
         getRelated(id).then(({ data: r }) => setRelated(r.related || [])).catch(() => {})
+        if (data.video.series_id) {
+          getNextEpisode(id).then(({ data: n }) => setNextEpisode(n.next || null)).catch(() => {})
+        }
         if (user) {
           getWatchLaterStatus(id).then(({ data: s }) => setSaved(s.saved)).catch(() => {})
           getReaction(id).then(({ data: r }) => { setLikes(r.likes); setDislikes(r.dislikes); setReactionState(r.mine) }).catch(() => {})
@@ -93,6 +106,23 @@ export default function Watch() {
     }
   }
 
+  const handleTimeUpdate = () => {
+    if (!videoRef.current || !video) return
+    const t = Math.floor(videoRef.current.currentTime)
+    // Skip intro button
+    if (video.intro_start != null && video.intro_end != null) {
+      setShowSkipIntro(t >= video.intro_start && t <= video.intro_end)
+    } else {
+      setShowSkipIntro(false)
+    }
+    // Skip recap button
+    if (video.recap_end != null) {
+      setShowSkipRecap(t < video.recap_end)
+    } else {
+      setShowSkipRecap(false)
+    }
+  }
+
   const handlePlay = () => {
     setShowResumeBanner(false)
     clearInterval(progressIntervalRef.current)
@@ -121,6 +151,39 @@ export default function Watch() {
       ? video.duration
       : (Math.floor(videoRef.current?.duration) || Math.floor(videoRef.current?.currentTime) || 0)
     if (seconds > 0) saveProgress(id, seconds).catch(() => {})
+    // Show next episode countdown if available
+    if (nextEpisode) {
+      setNextCountdown(5)
+      setShowNextOverlay(true)
+      let count = 5
+      nextCountdownRef.current = setInterval(() => {
+        count -= 1
+        setNextCountdown(count)
+        if (count <= 0) {
+          clearInterval(nextCountdownRef.current)
+          navigate(`/watch/${nextEpisode.id}`)
+        }
+      }, 1000)
+    }
+  }
+
+  const skipIntro = () => {
+    if (videoRef.current && video.intro_end != null) {
+      videoRef.current.currentTime = video.intro_end
+      setShowSkipIntro(false)
+    }
+  }
+
+  const skipRecap = () => {
+    if (videoRef.current && video.recap_end != null) {
+      videoRef.current.currentTime = video.recap_end
+      setShowSkipRecap(false)
+    }
+  }
+
+  const cancelNextEpisode = () => {
+    clearInterval(nextCountdownRef.current)
+    setShowNextOverlay(false)
   }
 
   const handleReaction = useCallback(async (type) => {
@@ -228,7 +291,44 @@ export default function Watch() {
           onPlay={handlePlay}
           onPause={handlePause}
           onEnded={handleEnded}
+          onTimeUpdate={handleTimeUpdate}
         />
+        {showSkipRecap && (
+          <button className="watch-skip-btn watch-skip-recap" onClick={skipRecap}>
+            Skip Recap ▶▶
+          </button>
+        )}
+        {showSkipIntro && (
+          <button className="watch-skip-btn watch-skip-intro" onClick={skipIntro}>
+            Skip Intro ▶▶
+          </button>
+        )}
+        {showNextOverlay && nextEpisode && (
+          <div className="watch-next-overlay">
+            <div className="watch-next-card">
+              {nextEpisode.thumbnail_url && (
+                <img src={nextEpisode.thumbnail_url} alt={nextEpisode.title} className="watch-next-thumb" />
+              )}
+              <div className="watch-next-info">
+                <div className="watch-next-label">Up Next in {nextCountdown}s</div>
+                <div className="watch-next-title">{nextEpisode.title}</div>
+                {nextEpisode.episode_number && (
+                  <div className="watch-next-ep">
+                    S{nextEpisode.season_number || 1} E{nextEpisode.episode_number}
+                  </div>
+                )}
+                <div className="watch-next-actions">
+                  <button className="btn btn-primary watch-next-now" onClick={() => { clearInterval(nextCountdownRef.current); navigate(`/watch/${nextEpisode.id}`) }}>
+                    Play Now
+                  </button>
+                  <button className="btn btn-ghost watch-next-cancel" onClick={cancelNextEpisode}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {showResumeBanner && resumeSeconds > 0 && (
           <div className="watch-resume-banner">
             <span>Resuming from {fmtTime(resumeSeconds)}</span>
