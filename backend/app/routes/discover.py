@@ -120,6 +120,8 @@ def browse():
     language = request.args.get('language', '').strip()
     rating = request.args.get('rating', '').strip()
     q = request.args.get('q', '').strip()
+    type_filter = request.args.get('type', '').strip()
+    duration_filter = request.args.get('duration', '').strip()
     page = request.args.get('page', 1, type=int)
     per_page = 24
 
@@ -132,6 +134,18 @@ def browse():
         video_query = video_query.filter_by(language=language)
     if rating:
         video_query = video_query.filter_by(content_rating=rating)
+    if type_filter == 'movie':
+        video_query = video_query.filter(Video.video_type.in_(['Movie', 'Movie Adaptation']))
+    elif type_filter == 'show':
+        video_query = video_query.filter(Video.video_type == 'Episode')
+    elif type_filter == 'standalone':
+        video_query = video_query.filter(Video.video_type == 'Standalone')
+    if duration_filter == 'short':
+        video_query = video_query.filter(Video.duration < 1800)
+    elif duration_filter == 'medium':
+        video_query = video_query.filter(Video.duration >= 1800, Video.duration <= 5400)
+    elif duration_filter == 'long':
+        video_query = video_query.filter(Video.duration > 5400)
 
     paginated = video_query.order_by(Video.view_count.desc()).paginate(
         page=page, per_page=per_page, error_out=False

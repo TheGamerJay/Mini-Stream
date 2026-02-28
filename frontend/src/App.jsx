@@ -18,6 +18,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Admin from './pages/Admin'
 import Profile from './pages/Profile'
+import Browse from './pages/Browse'
 import NotFound from './pages/NotFound'
 import {
   About, HowItWorks, ContentRules, DMCA, Privacy, Terms, Contact, FAQ, CreatorAgreement,
@@ -73,7 +74,7 @@ function AppRoutes() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/creator-agreement" element={<CreatorAgreement />} />
-          <Route path="/browse" element={<Navigate to="/home" replace />} />
+          <Route path="/browse" element={<Browse />} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
