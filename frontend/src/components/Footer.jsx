@@ -22,7 +22,6 @@ export default function Footer() {
               <span className="footer__col-title">Creators</span>
               <Link to="/become-creator">Become a Creator</Link>
               <Link to="/creator-agreement">Creator Agreement</Link>
-              <Link to="/content-rules">Content Rules</Link>
             </div>
             <div className="footer__col">
               <span className="footer__col-title">Legal</span>
