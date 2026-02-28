@@ -105,9 +105,12 @@ def admin_users():
 def admin_videos():
     page = request.args.get('page', 1, type=int)
     search = request.args.get('search', '').strip()
+    type_filter = request.args.get('type', '').strip()
     query = Video.query
     if search:
         query = query.filter(Video.title.ilike(f'%{search}%'))
+    if type_filter == 'movie':
+        query = query.filter(Video.video_type.in_(['Movie', 'Movie Adaptation']))
     paginated = query.order_by(Video.created_at.desc()).paginate(
         page=page, per_page=20, error_out=False
     )

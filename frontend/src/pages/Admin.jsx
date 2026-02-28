@@ -558,8 +558,133 @@ function SeriesTab({ token }) {
   )
 }
 
+// ── Movies tab ────────────────────────────────────────────────────────────────
+function MoviesTab({ token }) {
+  const [data, setData] = useState(null)
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [query, setQuery] = useState('')
+
+  const load = useCallback(() => {
+    const params = new URLSearchParams({ page, type: 'movie' })
+    if (query) params.set('search', query)
+    adminFetch(`/videos?${params}`, token).then(setData)
+  }, [token, page, query])
+
+  useEffect(() => { load() }, [load])
+
+  function handleSearch(e) {
+    e.preventDefault()
+    setPage(1)
+    setQuery(search)
+  }
+
+  async function deleteVideo(id) {
+    if (!confirm('Delete this movie?')) return
+    await adminFetch(`/videos/${id}`, token, { method: 'DELETE' })
+    load()
+  }
+
+  function fmtDuration(s) {
+    if (!s) return '—'
+    const m = Math.floor(s / 60), sec = s % 60
+    return `${m}m ${sec}s`
+  }
+
+  return (
+    <div>
+      <div className="admin-search-row">
+        <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8 }}>
+          <input
+            className="admin-search-input"
+            placeholder="Search by title…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="admin-page-btn" type="submit">Search</button>
+        </form>
+        {data && <span className="admin-count">{data.total} movies</span>}
+      </div>
+
+      {!data ? (
+        <div className="admin-loading">Loading…</div>
+      ) : (
+        <>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Creator</th>
+                  <th>Genre</th>
+                  <th>Type</th>
+                  <th>Rating</th>
+                  <th>Duration</th>
+                  <th>Views</th>
+                  <th>Status</th>
+                  <th>Uploaded</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.videos.map((v) => (
+                  <tr key={v.id}>
+                    <td>{v.id}</td>
+                    <td style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.title}</td>
+                    <td>{v.creator_name || '—'}</td>
+                    <td>{v.genre}</td>
+                    <td>{v.video_type}</td>
+                    <td>
+                      {v.content_rating === 'Mature' ? (
+                        <span className="admin-badge mature">Mature</span>
+                      ) : v.content_rating}
+                    </td>
+                    <td>{fmtDuration(v.duration)}</td>
+                    <td>{v.view_count.toLocaleString()}</td>
+                    <td>
+                      <span className={`admin-badge ${v.is_published ? 'published' : 'draft'}`}>
+                        {v.is_published ? 'Live' : 'Draft'}
+                      </span>
+                    </td>
+                    <td>{fmtDateTime(v.created_at)}</td>
+                    <td>
+                      <button className="admin-del-btn" onClick={() => deleteVideo(v.id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {data.pages > 1 && (
+            <div className="admin-pagination">
+              <button
+                className="admin-page-btn"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                ← Prev
+              </button>
+              <span className="admin-page-info">Page {page} / {data.pages}</span>
+              <button
+                className="admin-page-btn"
+                disabled={page >= data.pages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next →
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 // ── Main dashboard ────────────────────────────────────────────────────────────
-const TABS = ['Overview', 'Users', 'Videos', 'Series']
+const TABS = ['Overview', 'Users', 'Videos', 'Movies', 'Series']
 
 function AdminDashboard({ token, onLogout }) {
   const [tab, setTab] = useState('Overview')
@@ -585,6 +710,7 @@ function AdminDashboard({ token, onLogout }) {
         {tab === 'Overview' && <OverviewTab token={token} />}
         {tab === 'Users' && <UsersTab token={token} />}
         {tab === 'Videos' && <VideosTab token={token} />}
+        {tab === 'Movies' && <MoviesTab token={token} />}
         {tab === 'Series' && <SeriesTab token={token} />}
       </div>
     </div>
