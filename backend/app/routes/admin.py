@@ -751,16 +751,33 @@ def seed_demo():
 @admin_bp.route('/seed-demo', methods=['DELETE'])
 @require_admin
 def clear_demo():
+    from sqlalchemy import text as _text
     users = User.query.filter(User.email.in_(_DEMO_EMAILS)).all()
     if not users:
         return jsonify({'message': 'No demo data found.'}), 200
+
+    user_ids = [u.id for u in users]
+    # Collect all video IDs owned by demo creators
+    video_ids = [v.id for u in users for v in u.videos]
+
+    if video_ids:
+        id_list = ','.join(str(i) for i in video_ids)
+        # Delete child records that lack ON DELETE CASCADE
+        db.session.execute(_text(f'DELETE FROM watch_later WHERE video_id IN ({id_list})'))
+        db.session.execute(_text(f'DELETE FROM watch_history WHERE video_id IN ({id_list})'))
+
+    uid_list = ','.join(str(i) for i in user_ids)
+    # Also clear any watch_later/history where the demo user is the viewer
+    db.session.execute(_text(f'DELETE FROM watch_later WHERE user_id IN ({uid_list})'))
+    db.session.execute(_text(f'DELETE FROM watch_history WHERE user_id IN ({uid_list})'))
+
+    # Now safe to delete videos, series, users (remaining FKs have CASCADE)
     for u in users:
         for v in list(u.videos):
             db.session.delete(v)
         for s in list(u.series):
-            for ep in list(s.episodes):
-                db.session.delete(ep)
             db.session.delete(s)
         db.session.delete(u)
+
     db.session.commit()
     return jsonify({'message': 'Demo data cleared.'})
