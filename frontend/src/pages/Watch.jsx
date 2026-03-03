@@ -350,7 +350,11 @@ export default function Watch() {
 
   return (
     <div className="watch-page">
-      <div className="watch-player-wrap">
+      <div className="watch-player-section">
+        {video.thumbnail_url && (
+          <div className="watch-backdrop" style={{ backgroundImage: `url(${video.thumbnail_url})` }} />
+        )}
+        <div className="watch-player-wrap">
         <video
           ref={videoRef}
           className="watch-player"
@@ -432,6 +436,7 @@ export default function Watch() {
           </div>
         )}
       </div>
+      </div>{/* end watch-player-section */}
 
       <div className="container watch-body">
         <div className="watch-main">
