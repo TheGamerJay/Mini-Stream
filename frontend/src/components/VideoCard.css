@@ -182,3 +182,14 @@
   margin-top: 3px;
   opacity: 0.8;
 }
+.video-card__genre-tag {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.video-card__genre-tag:hover { color: var(--cyan); }

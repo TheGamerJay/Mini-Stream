@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { getContinueWatching, getHistory, removeHistory } from '../api'
 import VideoCard from '../components/VideoCard'
 import SkeletonCard from '../components/SkeletonCard'
+import EmptyState from '../components/EmptyState'
 import './WatchHistory.css'
 
 const TABS = [
@@ -82,10 +83,12 @@ export default function WatchHistory() {
           {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="history-empty">
-          <p>{filter ? `No videos match "${filter}".` : emptyMsg}</p>
-          {!filter && <Link to="/home" className="btn btn-primary">Explore Content</Link>}
-        </div>
+        <EmptyState
+          type={filter ? 'search' : 'history'}
+          title={filter ? `No results for "${filter}"` : (tab === 'progress' ? 'Nothing in progress' : 'No completed videos')}
+          message={filter ? 'Try a different search term.' : emptyMsg}
+          action={!filter && <Link to="/home" className="btn btn-primary">Explore Content</Link>}
+        />
       ) : (
         <div className="history-grid">
           {filtered.map((item) => {

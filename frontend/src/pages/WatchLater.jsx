@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getWatchLater, removeWatchLater } from '../api'
 import VideoCard from '../components/VideoCard'
 import SkeletonCard from '../components/SkeletonCard'
+import EmptyState from '../components/EmptyState'
 import './WatchLater.css'
 
 export default function WatchLater() {
@@ -54,12 +55,14 @@ export default function WatchLater() {
         </div>
       )}
       {items.length === 0 ? (
-        <div className="wl-empty">
-          <p>Nothing saved yet.</p>
-          <Link to="/home" className="btn btn-primary">Explore Content</Link>
-        </div>
+        <EmptyState
+          type="watchlater"
+          title="Your list is empty"
+          message="Save videos to watch later and they'll appear here."
+          action={<Link to="/home" className="btn btn-primary">Explore Content</Link>}
+        />
       ) : filtered.length === 0 ? (
-        <div className="wl-empty"><p>No videos match "{filter}".</p></div>
+        <EmptyState type="search" title={`No results for "${filter}"`} message="Try a different search term." />
       ) : (
         <div className="wl-grid">
           {filtered.map((item) => (

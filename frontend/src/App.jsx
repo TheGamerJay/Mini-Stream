@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
+import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import BottomNav from './components/BottomNav'
 
 // Pages
 import Landing from './pages/Landing'
@@ -21,6 +24,7 @@ import Profile from './pages/Profile'
 import Browse from './pages/Browse'
 import CreatorProfile from './pages/CreatorProfile'
 import NotFound from './pages/NotFound'
+import Onboarding from './pages/Onboarding'
 import {
   About, HowItWorks, ContentRules, DMCA, Privacy, Terms, Contact, FAQ, CreatorAgreement,
 } from './pages/StaticPages'
@@ -52,13 +56,14 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
-      <main className="main-content">
+      <main className="main-content fade-in" key={location.pathname}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
           <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
           <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/onboarding" element={<PrivateRoute><Onboarding /></PrivateRoute>} />
           <Route path="/home" element={<Home />} />
           <Route path="/watch/:id" element={<PrivateRoute><Watch /></PrivateRoute>} />
           <Route path="/series/:id" element={<PrivateRoute><SeriesPage /></PrivateRoute>} />
@@ -81,6 +86,7 @@ function AppRoutes() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <BottomNav />
       <Footer />
     </>
   )
@@ -89,9 +95,13 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppRoutes />
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

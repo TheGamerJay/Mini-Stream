@@ -267,6 +267,26 @@
 .mobile-signout { color: #f87171; }
 .mobile-signout:hover { color: #f87171; background: rgba(239,68,68,0.08); }
 
+/* Theme toggle */
+.navbar__theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+}
+.navbar__theme-toggle:hover { background: var(--bg-hover); }
+
+/* Light mode overrides */
+[data-theme="light"] .navbar { background: rgba(244,244,248,0.97); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+[data-theme="light"] .mobile-drawer { background: rgba(244,244,248,0.99); }
+[data-theme="light"] .navbar__hamburger span { background: var(--text-secondary); }
+
 @media (max-width: 768px) {
   .navbar__nav { display: none; }
   .navbar__hamburger { display: flex; }

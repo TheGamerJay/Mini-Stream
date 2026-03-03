@@ -29,6 +29,8 @@ export default function Watch() {
   const [dislikes, setDislikes] = useState(0)
   const [related, setRelated] = useState([])
   const [copied, setCopied] = useState(false)
+  const [embedOpen, setEmbedOpen] = useState(false)
+  const [embedCopied, setEmbedCopied] = useState(false)
   const [nextEpisode, setNextEpisode] = useState(null)
   const [showSkipIntro, setShowSkipIntro] = useState(false)
   const [showSkipRecap, setShowSkipRecap] = useState(false)
@@ -203,6 +205,15 @@ export default function Watch() {
     })
   }
 
+  const embedCode = video ? `<iframe src="${window.location.origin}/embed/${video.id}" width="560" height="315" frameborder="0" allowfullscreen title="${video.title}"></iframe>` : ''
+
+  const copyEmbed = () => {
+    navigator.clipboard.writeText(embedCode).then(() => {
+      setEmbedCopied(true)
+      setTimeout(() => setEmbedCopied(false), 2000)
+    })
+  }
+
   const handlePiP = async () => {
     if (!videoRef.current) return
     try {
@@ -350,7 +361,7 @@ export default function Watch() {
         <div className="watch-main">
           {/* Tags */}
           <div className="watch-tags">
-            {video.genre && <span className="tag tag-cyan">{video.genre}</span>}
+            {video.genre && <Link to={`/home?genre=${encodeURIComponent(video.genre)}`} className="tag tag-cyan">{video.genre}</Link>}
             {video.content_rating && <span className="tag tag-rating">{video.content_rating}</span>}
             {video.language && <span className="tag tag-neutral">{video.language}</span>}
             {video.series_title && <span className="tag tag-violet">Series</span>}
@@ -433,6 +444,13 @@ export default function Watch() {
               ⧉ PiP
             </button>
 
+            {/* Embed */}
+            {video.allow_sharing && (
+              <button className="btn btn-ghost" onClick={() => setEmbedOpen(true)}>
+                {'</>'} Embed
+              </button>
+            )}
+
             <button className="btn watch-report-btn" onClick={() => setReportOpen(true)}>
               Report
             </button>
@@ -466,6 +484,27 @@ export default function Watch() {
           )}
         </div>
       </div>
+
+      {/* Embed modal */}
+      {embedOpen && (
+        <div className="report-overlay" onClick={() => setEmbedOpen(false)}>
+          <div className="report-modal embed-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="report-close" onClick={() => setEmbedOpen(false)}>✕</button>
+            <h3 className="report-title">Embed this video</h3>
+            <p className="report-sub">Copy the code below to embed on your site</p>
+            <textarea
+              className="embed-code-box"
+              readOnly
+              value={embedCode}
+              rows={4}
+              onClick={(e) => e.target.select()}
+            />
+            <button className="btn btn-primary" onClick={copyEmbed} style={{ marginTop: 12 }}>
+              {embedCopied ? '✓ Copied!' : 'Copy Code'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Report modal */}
       {reportOpen && (

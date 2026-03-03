@@ -9,7 +9,13 @@
       "Bash(git push:*)",
       "Bash(python3:*)",
       "Bash(python seed_demo.py:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "WebFetch(domain:archive.org)",
+      "WebFetch(domain:mixkit.co)",
+      "WebFetch(domain:pixabay.com)",
+      "WebFetch(domain:download.blender.org)",
+      "WebFetch(domain:video.blender.org)",
+      "WebFetch(domain:durian.blender.org)"
     ]
   }
 }

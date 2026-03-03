@@ -4,6 +4,20 @@ import { addWatchLater, removeWatchLater } from '../api'
 import { useAuth } from '../context/AuthContext'
 import './VideoCard.css'
 
+function GenreTag({ genre }) {
+  const navigate = useNavigate()
+  const handleClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate(`/home?genre=${encodeURIComponent(genre)}`)
+  }
+  return (
+    <button className="video-card__genre-tag" onClick={handleClick} title={`Browse ${genre}`}>
+      {genre}
+    </button>
+  )
+}
+
 export default function VideoCard({ item, type = 'video' }) {
   const isVideo = type === 'video'
   const link = isVideo ? `/watch/${item.video_id ?? item.id}` : `/series/${item.id}`
@@ -88,7 +102,7 @@ export default function VideoCard({ item, type = 'video' }) {
             </span>
           )}
           {item.genre && <span className="dot">·</span>}
-          {item.genre && <span>{item.genre}</span>}
+          {item.genre && <GenreTag genre={item.genre} />}
           {item.language && <span className="dot">·</span>}
           {item.language && <span className="video-card__lang">{item.language}</span>}
         </div>
