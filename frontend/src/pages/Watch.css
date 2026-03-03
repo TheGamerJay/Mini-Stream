@@ -384,20 +384,6 @@
   .watch-next-thumb { width: 100%; }
 }
 
-.embed-modal { max-width: 520px; }
-.embed-code-box {
-  width: 100%;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-family: 'Courier New', monospace;
-  font-size: 0.78rem;
-  padding: 12px;
-  resize: none;
-  outline: none;
-  line-height: 1.5;
-}
 
 /* Star Rating */
 .watch-rating-row {

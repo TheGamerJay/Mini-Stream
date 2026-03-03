@@ -57,8 +57,6 @@ export default function Watch() {
   const [dislikes, setDislikes] = useState(0)
   const [related, setRelated] = useState([])
   const [copied, setCopied] = useState(false)
-  const [embedOpen, setEmbedOpen] = useState(false)
-  const [embedCopied, setEmbedCopied] = useState(false)
   const [nextEpisode, setNextEpisode] = useState(null)
   const [showSkipIntro, setShowSkipIntro] = useState(false)
   const [showSkipRecap, setShowSkipRecap] = useState(false)
@@ -273,15 +271,6 @@ export default function Watch() {
     navigator.clipboard.writeText(window.location.href).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
-  const embedCode = video ? `<iframe src="${window.location.origin}/embed/${video.id}" width="560" height="315" frameborder="0" allowfullscreen title="${video.title}"></iframe>` : ''
-
-  const copyEmbed = () => {
-    navigator.clipboard.writeText(embedCode).then(() => {
-      setEmbedCopied(true)
-      setTimeout(() => setEmbedCopied(false), 2000)
     })
   }
 
@@ -526,13 +515,6 @@ export default function Watch() {
               </button>
             )}
 
-            {/* Embed */}
-            {video.allow_sharing && (
-              <button className="btn btn-ghost" onClick={() => setEmbedOpen(true)}>
-                {'</>'} Embed
-              </button>
-            )}
-
             {/* Support Creator */}
             {video.creator_id && video.creator_id !== user?.id && (
               <button className="btn btn-support" onClick={() => setDonateOpen(true)}>
@@ -633,27 +615,6 @@ export default function Watch() {
                 </form>
               </>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Embed modal */}
-      {embedOpen && (
-        <div className="report-overlay" onClick={() => setEmbedOpen(false)}>
-          <div className="report-modal embed-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="report-close" onClick={() => setEmbedOpen(false)}>✕</button>
-            <h3 className="report-title">Embed this video</h3>
-            <p className="report-sub">Copy the code below to embed on your site</p>
-            <textarea
-              className="embed-code-box"
-              readOnly
-              value={embedCode}
-              rows={4}
-              onClick={(e) => e.target.select()}
-            />
-            <button className="btn btn-primary" onClick={copyEmbed} style={{ marginTop: 12 }}>
-              {embedCopied ? '✓ Copied!' : 'Copy Code'}
-            </button>
           </div>
         </div>
       )}
