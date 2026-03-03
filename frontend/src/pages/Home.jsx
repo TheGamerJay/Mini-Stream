@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, Navigate } from 'react-router-dom'
 import HeroBanner from '../components/HeroBanner'
 import HorizontalRow from '../components/HorizontalRow'
 import VideoCard from '../components/VideoCard'
@@ -112,6 +112,11 @@ export default function Home() {
   const selectAll = () => {
     setActiveGenre('')
     setSearchParams(buildParams('', activeRating, submittedQ))
+  }
+
+  // Guests with no active filter should see the landing page, not the home page
+  if (!user && !isFiltered) {
+    return <Navigate to="/" replace />
   }
 
   if (loadingHome && !homeData && !isFiltered) {
