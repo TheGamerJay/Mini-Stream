@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { addWatchLater, removeWatchLater } from '../api'
 import { useAuth } from '../context/AuthContext'
+import GuestAuthModal from './GuestAuthModal'
 import './VideoCard.css'
 
 function GenreTag({ genre }) {
@@ -27,6 +28,14 @@ export default function VideoCard({ item, type = 'video' }) {
 
   const [bookmarked, setBookmarked] = useState(false)
   const [bookmarking, setBookmarking] = useState(false)
+  const [guestModal, setGuestModal] = useState(false)
+
+  const handleCardClick = (e) => {
+    if (!user) {
+      e.preventDefault()
+      setGuestModal(true)
+    }
+  }
 
   const handleBookmark = async (e) => {
     e.preventDefault()
@@ -48,7 +57,8 @@ export default function VideoCard({ item, type = 'video' }) {
   }
 
   return (
-    <Link to={link} className="video-card">
+    <>
+    <Link to={link} className="video-card" onClick={handleCardClick}>
       <div className="video-card__thumb">
         {thumbnail ? (
           <img src={thumbnail} alt={item.title} loading="lazy" />
@@ -111,5 +121,7 @@ export default function VideoCard({ item, type = 'video' }) {
         )}
       </div>
     </Link>
+    {guestModal && <GuestAuthModal onClose={() => setGuestModal(false)} />}
+    </>
   )
 }
