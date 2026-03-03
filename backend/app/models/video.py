@@ -46,8 +46,6 @@ class Video(db.Model):
         'WatchHistory', backref='video', lazy='dynamic'
     )
     reactions = db.relationship('Reaction', backref='video', lazy='dynamic')
-    comments = db.relationship('Comment', backref='video', lazy='dynamic',
-                               primaryjoin='Comment.video_id == Video.id')
 
     def format_duration(self):
         if not self.duration:
