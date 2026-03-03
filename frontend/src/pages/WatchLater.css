@@ -27,6 +27,11 @@
 }
 .wl-filter-input:focus { border-color: var(--cyan); }
 .wl-filter-input::placeholder { color: var(--text-muted); }
-.wl-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-.wl-item { display: flex; flex-direction: column; gap: 8px; }
+.wl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+.wl-item { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.wl-item .video-card { width: 100%; }
 .wl-remove { font-size: 0.78rem; padding: 5px 12px; align-self: flex-start; }

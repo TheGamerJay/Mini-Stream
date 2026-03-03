@@ -43,8 +43,13 @@
   gap: 20px;
 }
 .history-empty p { color: var(--text-muted); }
-.history-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-.history-item { display: flex; flex-direction: column; gap: 8px; }
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+.history-item { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.history-item .video-card { width: 100%; }
 .history-remove { font-size: 0.78rem; padding: 5px 12px; align-self: flex-start; }
 
 /* Responsive */
