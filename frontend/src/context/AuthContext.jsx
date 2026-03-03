@@ -23,6 +23,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => { loadUser() }, [loadUser])
 
+  // Listen for forced logout events (e.g. token refresh failed)
+  useEffect(() => {
+    const handler = () => { setUser(null) }
+    window.addEventListener('auth:logout', handler)
+    return () => window.removeEventListener('auth:logout', handler)
+  }, [])
+
   const saveTokens = (tokens) => {
     localStorage.setItem('access_token', tokens.access_token)
     if (tokens.refresh_token) {

@@ -31,6 +31,7 @@ api.interceptors.response.use(
         } catch {
           localStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
+          window.dispatchEvent(new Event('auth:logout'))
         }
       }
     }
@@ -38,6 +39,7 @@ api.interceptors.response.use(
     if (error.response?.status === 422) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
+      window.dispatchEvent(new Event('auth:logout'))
     }
     return Promise.reject(error)
   }
