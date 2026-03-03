@@ -109,7 +109,7 @@
 .watch-share-btn { font-size: 0.85rem; padding: 8px 14px; }
 .watch-pip-overlay {
   position: absolute;
-  top: 10px;
+  bottom: 72px;
   right: 10px;
   background: rgba(0,0,0,0.55);
   border: 1px solid rgba(255,255,255,0.18);
