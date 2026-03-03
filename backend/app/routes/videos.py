@@ -165,6 +165,18 @@ def clear_history():
     return jsonify({'message': 'History cleared'})
 
 
+@videos_bp.route('/<int:video_id>/history', methods=['DELETE'])
+@jwt_required()
+def remove_from_history(video_id):
+    user_id = int(get_jwt_identity())
+    entry = WatchHistory.query.filter_by(user_id=user_id, video_id=video_id).first()
+    if not entry:
+        return jsonify({'error': 'Not in history'}), 404
+    db.session.delete(entry)
+    db.session.commit()
+    return jsonify({'message': 'Removed from history'})
+
+
 @videos_bp.route('/<int:video_id>/reaction', methods=['GET'])
 @jwt_required()
 def get_reaction(video_id):

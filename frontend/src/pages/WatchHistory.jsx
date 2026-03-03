@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { getContinueWatching, getHistory } from '../api'
+import { getContinueWatching, getHistory, removeHistory } from '../api'
 import VideoCard from '../components/VideoCard'
 import SkeletonCard from '../components/SkeletonCard'
 import './WatchHistory.css'
@@ -17,6 +17,13 @@ export default function WatchHistory() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
+
+  const remove = async (videoId) => {
+    try {
+      await removeHistory(videoId)
+      setItems(prev => prev.filter(i => (i.video_id ?? i.id) !== videoId))
+    } catch { /* ignore */ }
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -81,9 +88,17 @@ export default function WatchHistory() {
         </div>
       ) : (
         <div className="history-grid">
-          {filtered.map((item) => (
-            <VideoCard key={item.video_id ?? item.id} item={item} type="video" />
-          ))}
+          {filtered.map((item) => {
+            const vid = item.video_id ?? item.id
+            return (
+              <div key={vid} className="history-item">
+                <VideoCard item={item} type="video" />
+                <button className="history-remove btn btn-ghost" onClick={() => remove(vid)}>
+                  Remove
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
