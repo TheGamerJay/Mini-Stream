@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import BottomNav from './components/BottomNav'
+import AnnouncementBanner from './components/AnnouncementBanner'
 
 // Pages
 import Landing from './pages/Landing'
@@ -56,6 +57,7 @@ function AppRoutes() {
   return (
     <>
       <Navbar />
+      <AnnouncementBanner />
       <main className="main-content fade-in" key={location.pathname}>
         <Routes>
           <Route path="/" element={<Landing />} />

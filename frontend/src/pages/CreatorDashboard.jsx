@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import {
   getStats, getMyVideos, getMySeries,
   uploadVideo, createSeries, updateSeries, updateVideo, deleteVideo,
-  mergeClips, publishMerged,
+  mergeClips, publishMerged, getCreatorDonations,
 } from '../api'
 import './CreatorDashboard.css'
 
@@ -42,10 +42,11 @@ function UploadForm({ seriesList, onSuccess }) {
     title: '', description: '', genre: GENRES[0], language: LANGUAGES[0],
     video_type: VIDEO_TYPES[0], content_rating: RATINGS[0],
     series_id: '', episode_number: '', season_number: '1', allow_sharing: true,
-    intro_start: '', intro_end: '', recap_end: '',
+    intro_start: '', intro_end: '', recap_end: '', scheduled_publish_at: '',
   })
   const [videoFile, setVideoFile] = useState(null)
   const [thumbFile, setThumbFile] = useState(null)
+  const [subtitleFile, setSubtitleFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState('')
   const [error, setError] = useState('')
@@ -62,13 +63,15 @@ function UploadForm({ seriesList, onSuccess }) {
     Object.entries(form).forEach(([k, v]) => { if (v !== '' && v !== null) fd.append(k, v) })
     fd.append('video', videoFile)
     if (thumbFile) fd.append('thumbnail', thumbFile)
+    if (subtitleFile) fd.append('subtitle', subtitleFile)
     try {
       await uploadVideo(fd)
       setProgress('')
       onSuccess()
-      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1', allow_sharing: true, intro_start: '', intro_end: '', recap_end: '' })
+      setForm({ title: '', description: '', genre: GENRES[0], language: LANGUAGES[0], video_type: VIDEO_TYPES[0], content_rating: RATINGS[0], series_id: '', episode_number: '', season_number: '1', allow_sharing: true, intro_start: '', intro_end: '', recap_end: '', scheduled_publish_at: '' })
       setVideoFile(null)
       setThumbFile(null)
+      setSubtitleFile(null)
     } catch (err) {
       setError(err.response?.data?.error || 'Upload failed.')
       setProgress('')
@@ -150,6 +153,23 @@ function UploadForm({ seriesList, onSuccess }) {
           <label className="form-label">Thumbnail (optional)</label>
           <input type="file" className="form-input file-input" accept="image/*" onChange={e => setThumbFile(e.target.files[0])} />
         </div>
+        <div className="form-group">
+          <label className="form-label">Subtitles / CC (optional, .vtt or .srt)</label>
+          <input type="file" className="form-input file-input" accept=".vtt,.srt,text/vtt,text/plain" onChange={e => setSubtitleFile(e.target.files[0])} />
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Schedule Publish (optional)</label>
+        <input
+          type="datetime-local"
+          className="form-input"
+          value={form.scheduled_publish_at}
+          onChange={e => set('scheduled_publish_at', e.target.value)}
+        />
+        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4, display: 'block' }}>
+          Leave blank to publish immediately
+        </span>
       </div>
 
       <div className="form-group">
@@ -652,6 +672,67 @@ function ClipStudioTab({ seriesList, onSuccess }) {
   )
 }
 
+function RevenueTab({ creatorId }) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    if (!creatorId) return
+    setLoading(true)
+    getCreatorDonations(creatorId)
+      .then(({ data: d }) => setData(d))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [creatorId, page])
+
+  if (loading) return <div className="page-loader"><div className="spinner" /></div>
+
+  return (
+    <div>
+      <h2 className="panel-heading">Revenue</h2>
+      <p className="panel-sub">Voluntary donations received from your viewers.</p>
+
+      <div className="stats-bar" style={{ marginBottom: 28 }}>
+        <div className="stat-card">
+          <span className="stat-value">${(data?.total_earned || 0).toFixed(2)}</span>
+          <span className="stat-label">Total Earned</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-value">{data?.donations?.length || 0}</span>
+          <span className="stat-label">Donations</span>
+        </div>
+      </div>
+
+      {!data?.donations?.length ? (
+        <p className="muted">No donations yet. Keep creating great content!</p>
+      ) : (
+        <div className="manage-list">
+          {data.donations.map((d) => (
+            <div key={d.id} className="manage-item" style={{ alignItems: 'flex-start' }}>
+              <div className="manage-info">
+                <span className="manage-title">${parseFloat(d.amount).toFixed(2)} from a supporter</span>
+                <span className="manage-meta">{new Date(d.created_at).toLocaleDateString()}</span>
+                {d.message && <span className="manage-series" style={{ fontStyle: 'italic' }}>"{d.message}"</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginTop: 28, padding: 20, background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+        <h3 style={{ marginBottom: 8, fontSize: '1rem' }}>Payouts</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 12 }}>
+          Stripe payouts coming soon. Your earnings are tracked and will be available for withdrawal once the payout system launches.
+        </p>
+        <button className="btn btn-ghost" disabled style={{ opacity: 0.5 }}>
+          Setup Payout Account (Coming Soon)
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function CreatorDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -747,6 +828,7 @@ export default function CreatorDashboard() {
             ['series', 'Create Series'],
             ['manage', 'Manage Videos'],
             ['studio', 'Clip Studio'],
+            ['revenue', 'Revenue'],
           ].map(([key, label]) => (
             <button
               key={key}
@@ -797,6 +879,10 @@ export default function CreatorDashboard() {
 
           {tab === 'studio' && (
             <ClipStudioTab seriesList={seriesList} onSuccess={load} />
+          )}
+
+          {tab === 'revenue' && (
+            <RevenueTab creatorId={user?.id} />
           )}
 
           {tab === 'manage' && (

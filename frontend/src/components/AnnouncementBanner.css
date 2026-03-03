@@ -1,0 +1,39 @@
+.ann-banner {
+  position: fixed;
+  top: 64px; /* below navbar */
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  animation: annSlide 0.3s ease forwards;
+}
+
+@keyframes annSlide {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.ann-banner--info    { background: #1565c0; color: #fff; }
+.ann-banner--warning { background: #e65100; color: #fff; }
+.ann-banner--success { background: #1b5e20; color: #fff; }
+
+.ann-banner__msg { flex: 1; text-align: center; }
+
+.ann-banner__close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.7;
+  padding: 2px 6px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ann-banner__close:hover { opacity: 1; }

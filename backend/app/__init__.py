@@ -54,12 +54,11 @@ def create_app(config_name=None):
     from .routes.discover import discover_bp
     from .routes.admin import admin_bp
     from .routes.studio import studio_bp
-    from .routes.comments import comments_bp
-    from .routes.follows import follows_bp
     from .routes.notifications import notifications_bp
     from .routes.playlists import playlists_bp
     from .routes.donations import donations_bp
     from .routes.onboarding import onboarding_bp
+    from .routes.ratings import ratings_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(videos_bp, url_prefix='/api/videos')
@@ -68,12 +67,11 @@ def create_app(config_name=None):
     app.register_blueprint(discover_bp, url_prefix='/api/stream')
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(studio_bp, url_prefix='/api/studio')
-    app.register_blueprint(comments_bp, url_prefix='/api/videos')
-    app.register_blueprint(follows_bp, url_prefix='/api/creators')
     app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
     app.register_blueprint(playlists_bp, url_prefix='/api/playlists')
     app.register_blueprint(donations_bp, url_prefix='/api/creators')
     app.register_blueprint(onboarding_bp, url_prefix='/api/onboarding')
+    app.register_blueprint(ratings_bp, url_prefix='/api/videos')
 
     @app.route('/api/health')
     def health():

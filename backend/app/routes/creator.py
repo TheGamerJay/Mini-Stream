@@ -32,6 +32,7 @@ def upload_video():
 
     video_file = request.files['video']
     thumbnail_file = request.files.get('thumbnail')
+    subtitle_file = request.files.get('subtitle')
 
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
@@ -46,6 +47,14 @@ def upload_video():
     intro_start = request.form.get('intro_start', type=int)
     intro_end = request.form.get('intro_end', type=int)
     recap_end = request.form.get('recap_end', type=int)
+    scheduled_publish_at = None
+    scheduled_at_str = request.form.get('scheduled_publish_at', '').strip()
+    if scheduled_at_str:
+        from datetime import datetime
+        try:
+            scheduled_publish_at = datetime.fromisoformat(scheduled_at_str)
+        except ValueError:
+            pass
 
     if not title or not genre or not description or not language:
         return jsonify({'error': 'Title, genre, language, and description are required'}), 400
@@ -75,6 +84,17 @@ def upload_video():
         except Exception:
             pass
 
+    subtitle_url = None
+    if subtitle_file:
+        try:
+            sub_result = cloudinary.uploader.upload(
+                subtitle_file, resource_type='raw', folder='ministream/subtitles'
+            )
+            subtitle_url = sub_result['secure_url']
+        except Exception:
+            pass
+
+    is_published = scheduled_publish_at is None
     video = Video(
         creator_id=user_id,
         series_id=series_id,
@@ -86,6 +106,7 @@ def upload_video():
         content_rating=content_rating,
         video_url=video_result['secure_url'],
         thumbnail_url=thumbnail_url,
+        subtitle_url=subtitle_url,
         cloudinary_public_id=video_result['public_id'],
         duration=int(video_result.get('duration', 0) or 0),
         episode_number=episode_number,
@@ -94,6 +115,8 @@ def upload_video():
         intro_start=intro_start,
         intro_end=intro_end,
         recap_end=recap_end,
+        scheduled_publish_at=scheduled_publish_at,
+        is_published=is_published,
     )
     db.session.add(video)
     db.session.commit()
@@ -227,6 +250,16 @@ def update_video(video_id):
         video.intro_end = data['intro_end'] or None
     if 'recap_end' in data:
         video.recap_end = data['recap_end'] or None
+    if 'content_rating' in data:
+        video.content_rating = data['content_rating']
+    if 'scheduled_publish_at' in data:
+        from datetime import datetime
+        val = data['scheduled_publish_at']
+        video.scheduled_publish_at = datetime.fromisoformat(val) if val else None
+        if not val:
+            video.is_published = True
+    if 'subtitle_url' in data:
+        video.subtitle_url = data['subtitle_url'] or None
 
     db.session.commit()
     return jsonify({'video': video.to_dict()})

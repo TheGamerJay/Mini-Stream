@@ -1,9 +1,36 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated, getNextEpisode } from '../api'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated, getNextEpisode, getRating, setRating, deleteRating, donateToCreator } from '../api'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import VideoCard from '../components/VideoCard'
 import './Watch.css'
+
+const DONATION_AMOUNTS = [1, 3, 5, 10, 20, 50]
+
+function StarRating({ myRating, average, count, onRate, disabled }) {
+  const [hover, setHover] = useState(0)
+  return (
+    <div className="star-rating">
+      <div className="star-rating__stars">
+        {[1, 2, 3, 4, 5].map((s) => (
+          <button
+            key={s}
+            className={`star-btn${(hover || myRating) >= s ? ' star-filled' : ''}`}
+            onClick={() => !disabled && onRate(s)}
+            onMouseEnter={() => setHover(s)}
+            onMouseLeave={() => setHover(0)}
+            disabled={disabled}
+            title={`Rate ${s} star${s !== 1 ? 's' : ''}`}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      {average && <span className="star-rating__avg">{average} ({count})</span>}
+    </div>
+  )
+}
 
 const REPORT_REASONS = [
   'Spam or misleading',
@@ -17,6 +44,7 @@ const REPORT_REASONS = [
 export default function Watch() {
   const { id } = useParams()
   const { user } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const [video, setVideo] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -45,6 +73,18 @@ export default function Watch() {
   const [resumeSeconds, setResumeSeconds] = useState(0)
   const [showResumeBanner, setShowResumeBanner] = useState(false)
 
+  // Rating state
+  const [myRating, setMyRating] = useState(null)
+  const [avgRating, setAvgRating] = useState(null)
+  const [ratingCount, setRatingCount] = useState(0)
+
+  // Donation modal state
+  const [donateOpen, setDonateOpen] = useState(false)
+  const [donateAmount, setDonateAmount] = useState(5)
+  const [donateMsg, setDonateMsg] = useState('')
+  const [donating, setDonating] = useState(false)
+  const [donateDone, setDonateDone] = useState(false)
+
   // Report modal state
   const [reportOpen, setReportOpen] = useState(false)
   const [reportReason, setReportReason] = useState(REPORT_REASONS[0])
@@ -69,6 +109,7 @@ export default function Watch() {
         if (data.video.series_id) {
           getNextEpisode(id).then(({ data: n }) => setNextEpisode(n.next || null)).catch(() => {})
         }
+        getRating(id).then(({ data: r }) => { setAvgRating(r.average); setRatingCount(r.count); setMyRating(r.mine) }).catch(() => {})
         if (user) {
           getWatchLaterStatus(id).then(({ data: s }) => setSaved(s.saved)).catch(() => {})
           getReaction(id).then(({ data: r }) => { setLikes(r.likes); setDislikes(r.dislikes); setReactionState(r.mine) }).catch(() => {})
@@ -198,6 +239,36 @@ export default function Watch() {
     } catch { /* ignore */ }
   }, [id, user])
 
+  const handleRate = async (stars) => {
+    if (!user) { showToast('Sign in to rate', 'info'); return }
+    try {
+      const { data } = await setRating(id, stars)
+      setMyRating(data.mine)
+      setAvgRating(data.average)
+      setRatingCount(data.count)
+      showToast(`Rated ${stars} star${stars !== 1 ? 's' : ''}`, 'success')
+    } catch { showToast('Failed to save rating', 'error') }
+  }
+
+  const handleDonate = async (e) => {
+    e.preventDefault()
+    if (!video?.creator_id) return
+    setDonating(true)
+    try {
+      await donateToCreator(video.creator_id, { amount: donateAmount, message: donateMsg })
+      setDonateDone(true)
+    } catch { showToast('Donation failed. Please try again.', 'error') } finally {
+      setDonating(false)
+    }
+  }
+
+  const closeDonate = () => {
+    setDonateOpen(false)
+    setDonateDone(false)
+    setDonateMsg('')
+    setDonateAmount(5)
+  }
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
       setCopied(true)
@@ -303,7 +374,17 @@ export default function Watch() {
           onPause={handlePause}
           onEnded={handleEnded}
           onTimeUpdate={handleTimeUpdate}
-        />
+        >
+          {video.subtitle_url && (
+            <track
+              kind="subtitles"
+              src={video.subtitle_url}
+              srcLang={video.language?.toLowerCase().slice(0, 2) || 'en'}
+              label={video.language || 'Subtitles'}
+              default
+            />
+          )}
+        </video>
         {showSkipRecap && (
           <button className="watch-skip-btn watch-skip-recap" onClick={skipRecap}>
             Skip Recap ▶▶
@@ -451,9 +532,28 @@ export default function Watch() {
               </button>
             )}
 
+            {/* Support Creator */}
+            {video.creator_id && video.creator_id !== user?.id && (
+              <button className="btn btn-support" onClick={() => setDonateOpen(true)}>
+                ♥ Support Creator
+              </button>
+            )}
+
             <button className="btn watch-report-btn" onClick={() => setReportOpen(true)}>
               Report
             </button>
+          </div>
+
+          {/* Star Rating */}
+          <div className="watch-rating-row">
+            <span className="watch-rating-label">Rate this</span>
+            <StarRating
+              myRating={myRating}
+              average={avgRating}
+              count={ratingCount}
+              onRate={handleRate}
+              disabled={!user}
+            />
           </div>
 
           {video.description && (
@@ -484,6 +584,57 @@ export default function Watch() {
           )}
         </div>
       </div>
+
+      {/* Donation modal */}
+      {donateOpen && (
+        <div className="report-overlay" onClick={closeDonate}>
+          <div className="report-modal donate-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="report-close" onClick={closeDonate}>✕</button>
+            {donateDone ? (
+              <div className="report-done">
+                <div className="report-done-icon donate-done-icon">♥</div>
+                <h3>Thank you for your support!</h3>
+                <p>Your donation goes directly to {video.creator_name}.</p>
+                <button className="btn btn-ghost" onClick={closeDonate}>Close</button>
+              </div>
+            ) : (
+              <>
+                <h3 className="report-title">Support {video.creator_name}</h3>
+                <p className="report-sub">100% of your donation goes to the creator</p>
+                <form onSubmit={handleDonate}>
+                  <div className="donate-amounts">
+                    {DONATION_AMOUNTS.map((amt) => (
+                      <button
+                        type="button"
+                        key={amt}
+                        className={`donate-amt-btn${donateAmount === amt ? ' selected' : ''}`}
+                        onClick={() => setDonateAmount(amt)}
+                      >
+                        ${amt}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    className="report-notes"
+                    placeholder="Leave a message (optional)"
+                    value={donateMsg}
+                    onChange={(e) => setDonateMsg(e.target.value)}
+                    rows={2}
+                    maxLength={200}
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-support donate-submit-btn"
+                    disabled={donating}
+                  >
+                    {donating ? 'Processing…' : `Donate $${donateAmount}`}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Embed modal */}
       {embedOpen && (

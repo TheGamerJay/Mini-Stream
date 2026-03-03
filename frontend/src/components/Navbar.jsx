@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { autocomplete } from '../api'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -14,13 +15,18 @@ export default function Navbar() {
   const [hidden, setHidden] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQ, setSearchQ] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const searchInputRef = useRef(null)
+  const acTimerRef = useRef(null)
   const lastY = useRef(0)
 
   // Close search on navigation
   useEffect(() => {
     setSearchOpen(false)
     setSearchQ('')
+    setSuggestions([])
+    setShowSuggestions(false)
     setMobileOpen(false)
   }, [location.pathname])
 
@@ -29,9 +35,38 @@ export default function Navbar() {
     if (searchOpen && searchInputRef.current) searchInputRef.current.focus()
   }, [searchOpen])
 
+  const fetchSuggestions = useCallback((q) => {
+    clearTimeout(acTimerRef.current)
+    if (q.length < 2) { setSuggestions([]); setShowSuggestions(false); return }
+    acTimerRef.current = setTimeout(async () => {
+      try {
+        const { data } = await autocomplete(q)
+        setSuggestions(data.suggestions || [])
+        setShowSuggestions(true)
+      } catch { /* ignore */ }
+    }, 220)
+  }, [])
+
+  const handleSearchChange = (e) => {
+    const q = e.target.value
+    setSearchQ(q)
+    fetchSuggestions(q)
+  }
+
+  const pickSuggestion = (s) => {
+    setShowSuggestions(false)
+    setSuggestions([])
+    setSearchOpen(false)
+    setSearchQ('')
+    if (s.type === 'video') navigate(`/watch/${s.id}`)
+    else if (s.type === 'creator') navigate(`/creator/${s.id}`)
+    else navigate('/home?q=' + encodeURIComponent(s.label))
+  }
+
   const submitSearch = (e) => {
     e?.preventDefault()
     const q = searchQ.trim()
+    setShowSuggestions(false)
     if (!q) { setSearchOpen(false); return }
     navigate('/home?q=' + encodeURIComponent(q))
     setSearchOpen(false)
@@ -87,12 +122,30 @@ export default function Navbar() {
                       className="navbar__search-input"
                       placeholder="Search videos…"
                       value={searchQ}
-                      onChange={e => setSearchQ(e.target.value)}
+                      onChange={handleSearchChange}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                      onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                      autoComplete="off"
                     />
                     <button type="submit" className="navbar__search-icon" aria-label="Search">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </button>
-                    <button type="button" className="navbar__search-close" onClick={() => { setSearchOpen(false); setSearchQ('') }}>✕</button>
+                    <button type="button" className="navbar__search-close" onClick={() => { setSearchOpen(false); setSearchQ(''); setSuggestions([]); setShowSuggestions(false) }}>✕</button>
+                    {showSuggestions && suggestions.length > 0 && (
+                      <div className="navbar__autocomplete">
+                        {suggestions.map((s, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            className="navbar__ac-item"
+                            onMouseDown={() => pickSuggestion(s)}
+                          >
+                            <span className="navbar__ac-type">{s.type === 'creator' ? '👤' : '▶'}</span>
+                            <span className="navbar__ac-label">{s.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </form>
                 )}
                 {!searchOpen && (

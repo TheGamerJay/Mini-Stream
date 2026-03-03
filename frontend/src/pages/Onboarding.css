@@ -1,0 +1,65 @@
+.onboarding-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background: var(--bg-primary);
+}
+
+.onboarding-card {
+  max-width: 680px;
+  width: 100%;
+  text-align: center;
+}
+
+.onboarding-title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.onboarding-sub {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 36px;
+}
+
+.onboarding-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.onboarding-genre-btn {
+  padding: 10px 20px;
+  border: 2px solid var(--border);
+  border-radius: 99px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.onboarding-genre-btn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.onboarding-genre-btn.selected {
+  border-color: var(--cyan);
+  background: rgba(0, 230, 230, 0.12);
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.onboarding-continue {
+  padding: 14px 36px;
+  font-size: 1rem;
+  border-radius: 99px;
+}

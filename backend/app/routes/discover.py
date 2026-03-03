@@ -193,7 +193,6 @@ def browse():
 
 @discover_bp.route('/creator/<int:creator_id>', methods=['GET'])
 def get_creator_profile(creator_id):
-    from ..models.follow import Follow
     user = User.query.get_or_404(creator_id)
     if not user.is_creator:
         return jsonify({'error': 'Not a creator'}), 404
@@ -203,7 +202,6 @@ def get_creator_profile(creator_id):
         .limit(50)
         .all()
     )
-    follower_count = Follow.query.filter_by(followed_id=creator_id).count()
     total_views = sum(v.view_count for v in videos)
     creator_data = {
         'id': user.id,
@@ -213,7 +211,6 @@ def get_creator_profile(creator_id):
         'website': user.website,
         'location': user.location,
         'video_count': len(videos),
-        'follower_count': follower_count,
         'total_views': total_views,
     }
     return jsonify({'creator': creator_data, 'videos': [v.to_dict() for v in videos]})

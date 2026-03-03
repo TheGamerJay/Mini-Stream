@@ -113,4 +113,31 @@ export const publishMerged = (data) => api.post('/studio/publish', data)
 export const reportVideo = (id, data) => api.post(`/videos/${id}/report`, data)
 export const submitContact = (data) => api.post('/auth/contact', data)
 
+// Ratings (1-5 stars)
+export const getRating = (videoId) => api.get(`/videos/${videoId}/rating`)
+export const setRating = (videoId, stars) => api.post(`/videos/${videoId}/rating`, { stars })
+export const deleteRating = (videoId) => api.delete(`/videos/${videoId}/rating`)
+
+// Playlists
+export const getPlaylists = () => api.get('/playlists')
+export const createPlaylist = (data) => api.post('/playlists', data)
+export const getPlaylist = (id) => api.get(`/playlists/${id}`)
+export const updatePlaylist = (id, data) => api.put(`/playlists/${id}`, data)
+export const deletePlaylist = (id) => api.delete(`/playlists/${id}`)
+export const addToPlaylist = (playlistId, videoId) => api.post(`/playlists/${playlistId}/items`, { video_id: videoId })
+export const removeFromPlaylist = (playlistId, videoId) => api.delete(`/playlists/${playlistId}/items/${videoId}`)
+
+// Donations
+export const donateToCreator = (creatorId, data) => api.post(`/creators/${creatorId}/donate`, data)
+export const getCreatorDonations = (creatorId) => api.get(`/creators/${creatorId}/donations`)
+
+// Autocomplete
+export const autocomplete = (q) => api.get('/stream/autocomplete', { params: { q } })
+
+// Announcement
+export const getAnnouncement = () => api.get('/stream/announcement')
+
+// Onboarding
+export const completeOnboarding = (genres) => api.post('/onboarding', { genres })
+
 export default api
