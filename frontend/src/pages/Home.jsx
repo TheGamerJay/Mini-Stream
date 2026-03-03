@@ -147,42 +147,46 @@ export default function Home() {
           )}
         </form>
 
-        {/* Genre tab strip */}
-        <div className="genre-tabs-wrap">
-          <div className="genre-tabs">
-            <button
-              className={`genre-tab${!activeGenre ? ' active' : ''}`}
-              onClick={selectAll}
-            >
-              All
-            </button>
-            {GENRES.map((g) => (
+        {/* Genre tab strip — hidden for guests on unfiltered view */}
+        {(user || isFiltered) && (
+          <div className="genre-tabs-wrap">
+            <div className="genre-tabs">
               <button
-                key={g}
-                className={`genre-tab${activeGenre === g ? ' active' : ''}`}
-                onClick={() => handleGenre(g)}
+                className={`genre-tab${!activeGenre ? ' active' : ''}`}
+                onClick={selectAll}
               >
-                {g}
+                All
               </button>
-            ))}
+              {GENRES.map((g) => (
+                <button
+                  key={g}
+                  className={`genre-tab${activeGenre === g ? ' active' : ''}`}
+                  onClick={() => handleGenre(g)}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Rating filter strip */}
-        <div className="rating-tabs-wrap">
-          <span className="rating-tabs-label">Rating:</span>
-          <div className="rating-tabs">
-            {RATINGS.map((r) => (
-              <button
-                key={r}
-                className={`rating-tab${activeRating === r ? ' active' : ''}`}
-                onClick={() => handleRating(r)}
-              >
-                {r}
-              </button>
-            ))}
+        {/* Rating filter strip — hidden for guests on unfiltered view */}
+        {(user || isFiltered) && (
+          <div className="rating-tabs-wrap">
+            <span className="rating-tabs-label">Rating:</span>
+            <div className="rating-tabs">
+              {RATINGS.map((r) => (
+                <button
+                  key={r}
+                  className={`rating-tab${activeRating === r ? ' active' : ''}`}
+                  onClick={() => handleRating(r)}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Result count when filtered */}
         {isFiltered && !loadingBrowse && (
