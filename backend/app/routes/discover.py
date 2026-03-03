@@ -158,6 +158,30 @@ def browse():
     })
 
 
+@discover_bp.route('/creator/<int:creator_id>', methods=['GET'])
+def get_creator_profile(creator_id):
+    from ..models.user import User
+    user = User.query.get_or_404(creator_id)
+    if not user.is_creator:
+        return jsonify({'error': 'Not a creator'}), 404
+    videos = (
+        Video.query.filter_by(creator_id=creator_id, is_published=True)
+        .order_by(Video.view_count.desc())
+        .limit(50)
+        .all()
+    )
+    creator_data = {
+        'id': user.id,
+        'display_name': user.display_name,
+        'bio': user.bio,
+        'avatar_url': user.avatar_url,
+        'website': getattr(user, 'website', None),
+        'location': getattr(user, 'location', None),
+        'video_count': len(videos),
+    }
+    return jsonify({'creator': creator_data, 'videos': [v.to_dict() for v in videos]})
+
+
 @discover_bp.route('/genres', methods=['GET'])
 def genres():
     return jsonify({'genres': GENRES})

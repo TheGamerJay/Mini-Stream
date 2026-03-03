@@ -26,6 +26,14 @@
 .history-tab-btn:hover { color: var(--text-primary); }
 .history-tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
 
+.history-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.history-count { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; }
+
 .history-empty {
   text-align: center;
   padding: 80px 0;

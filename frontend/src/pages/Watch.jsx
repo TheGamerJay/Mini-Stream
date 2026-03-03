@@ -365,10 +365,10 @@ export default function Watch() {
 
           <div className="watch-meta">
             {video.creator_name && (
-              <span className="watch-creator">
+              <Link to={`/creator/${video.creator_id}`} className="watch-creator">
                 By {video.creator_name}
                 <span className="watch-creator-badge">✦ Creator</span>
-              </span>
+              </Link>
             )}
             {video.series_title && (
               <Link to={`/series/${video.series_id}`} className="watch-series-link">

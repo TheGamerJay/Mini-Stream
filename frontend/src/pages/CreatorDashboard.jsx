@@ -660,6 +660,32 @@ export default function CreatorDashboard() {
   const [videos, setVideos] = useState([])
   const [seriesList, setSeriesList] = useState([])
   const [loading, setLoading] = useState(true)
+  const [editVideo, setEditVideo] = useState(null)
+  const [editSaving, setEditSaving] = useState(false)
+
+  const openEdit = (v) => setEditVideo({ ...v, intro_start: v.intro_start ?? '', intro_end: v.intro_end ?? '', recap_end: v.recap_end ?? '' })
+  const closeEdit = () => setEditVideo(null)
+  const setEF = (k, val) => setEditVideo(ev => ({ ...ev, [k]: val }))
+
+  const saveEdit = async (e) => {
+    e.preventDefault()
+    setEditSaving(true)
+    try {
+      const { data } = await updateVideo(editVideo.id, {
+        title: editVideo.title,
+        description: editVideo.description,
+        genre: editVideo.genre,
+        content_rating: editVideo.content_rating,
+        intro_start: editVideo.intro_start !== '' ? Number(editVideo.intro_start) : null,
+        intro_end: editVideo.intro_end !== '' ? Number(editVideo.intro_end) : null,
+        recap_end: editVideo.recap_end !== '' ? Number(editVideo.recap_end) : null,
+      })
+      setVideos(v => v.map(x => x.id === editVideo.id ? data.video : x))
+      closeEdit()
+    } catch { /* ignore */ } finally {
+      setEditSaving(false)
+    }
+  }
 
   const load = async () => {
     setLoading(true)
@@ -789,6 +815,7 @@ export default function CreatorDashboard() {
                         {v.series_title && <span className="manage-series">{v.series_title}</span>}
                       </div>
                       <div className="manage-actions">
+                        <button className="btn btn-ghost" onClick={() => openEdit(v)}>Edit</button>
                         <button
                           className={`btn ${v.is_published ? 'btn-ghost' : 'btn-outline-cyan'}`}
                           onClick={() => togglePublish(v)}
@@ -807,6 +834,60 @@ export default function CreatorDashboard() {
           )}
         </div>
       </div>
+
+      {/* Edit Video Modal */}
+      {editVideo && (
+        <div className="report-overlay" onClick={closeEdit}>
+          <div className="report-modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+            <button className="report-close" onClick={closeEdit}>✕</button>
+            <h3 className="report-title">Edit Video</h3>
+            <form onSubmit={saveEdit} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+              <div className="form-group">
+                <label className="form-label">Title *</label>
+                <input className="form-input" value={editVideo.title} onChange={e => setEF('title', e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea className="form-input" value={editVideo.description || ''} onChange={e => setEF('description', e.target.value)} rows={3} style={{ resize: 'vertical' }} />
+              </div>
+              <div className="form-row" style={{ marginTop: 0 }}>
+                <div className="form-group">
+                  <label className="form-label">Genre</label>
+                  <select className="form-input" value={editVideo.genre} onChange={e => setEF('genre', e.target.value)}>
+                    {GENRES.map(g => <option key={g}>{g}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Rating</label>
+                  <select className="form-input" value={editVideo.content_rating} onChange={e => setEF('content_rating', e.target.value)}>
+                    {RATINGS.map(r => <option key={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label" style={{ marginBottom: 8 }}>Intro / Recap Timestamps (seconds)</label>
+                <div className="form-row" style={{ marginTop: 0 }}>
+                  <div className="form-group">
+                    <label className="form-label">Intro Start</label>
+                    <input type="number" className="form-input" value={editVideo.intro_start} onChange={e => setEF('intro_start', e.target.value)} min="0" placeholder="e.g. 5" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Intro End</label>
+                    <input type="number" className="form-input" value={editVideo.intro_end} onChange={e => setEF('intro_end', e.target.value)} min="0" placeholder="e.g. 90" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Recap End</label>
+                    <input type="number" className="form-input" value={editVideo.recap_end} onChange={e => setEF('recap_end', e.target.value)} min="0" placeholder="e.g. 60" />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary report-submit-btn" disabled={editSaving}>
+                {editSaving ? 'Saving…' : 'Save Changes'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

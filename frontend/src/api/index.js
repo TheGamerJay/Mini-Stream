@@ -77,6 +77,7 @@ export const getReaction = (id) => api.get(`/videos/${id}/reaction`)
 export const setReaction = (id, reaction) => api.post(`/videos/${id}/reaction`, { reaction })
 export const getRelated = (id) => api.get(`/videos/${id}/related`)
 export const getNextEpisode = (id) => api.get(`/videos/${id}/next`)
+export const getCreatorProfile = (id) => api.get(`/stream/creator/${id}`)
 
 // Series
 export const getSeries = (id) => api.get(`/series/${id}`)

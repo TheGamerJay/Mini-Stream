@@ -1,15 +1,40 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQ, setSearchQ] = useState('')
+  const searchInputRef = useRef(null)
   const lastY = useRef(0)
+
+  // Close search on navigation
+  useEffect(() => {
+    setSearchOpen(false)
+    setSearchQ('')
+    setMobileOpen(false)
+  }, [location.pathname])
+
+  // Focus input when search opens
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) searchInputRef.current.focus()
+  }, [searchOpen])
+
+  const submitSearch = (e) => {
+    e?.preventDefault()
+    const q = searchQ.trim()
+    if (!q) { setSearchOpen(false); return }
+    navigate('/home?q=' + encodeURIComponent(q))
+    setSearchOpen(false)
+    setSearchQ('')
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,6 +76,30 @@ export default function Navbar() {
         <div className="navbar__actions">
           {user ? (
             <>
+              {/* Search */}
+              <div className={`navbar__search${searchOpen ? ' navbar__search--open' : ''}`}>
+                {searchOpen && (
+                  <form onSubmit={submitSearch} className="navbar__search-form">
+                    <input
+                      ref={searchInputRef}
+                      className="navbar__search-input"
+                      placeholder="Search videos…"
+                      value={searchQ}
+                      onChange={e => setSearchQ(e.target.value)}
+                    />
+                    <button type="submit" className="navbar__search-icon" aria-label="Search">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </button>
+                    <button type="button" className="navbar__search-close" onClick={() => { setSearchOpen(false); setSearchQ('') }}>✕</button>
+                  </form>
+                )}
+                {!searchOpen && (
+                  <button className="navbar__search-toggle" onClick={() => setSearchOpen(true)} aria-label="Open search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                  </button>
+                )}
+              </div>
+
               {/* Hamburger — mobile only */}
               <button
                 className="navbar__hamburger"
@@ -98,6 +147,17 @@ export default function Navbar() {
       {/* Mobile drawer */}
       {mobileOpen && user && (
         <div className="mobile-drawer">
+          <form onSubmit={(e) => { e.preventDefault(); submitSearch() }} className="mobile-search-form">
+            <input
+              className="mobile-search-input"
+              placeholder="Search videos…"
+              value={searchQ}
+              onChange={e => setSearchQ(e.target.value)}
+            />
+            <button type="submit" className="navbar__search-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </button>
+          </form>
           <NavLink to="/home" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} onClick={closeMobile}>
             Stream
           </NavLink>

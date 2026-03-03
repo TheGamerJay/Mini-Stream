@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getWatchLater, removeWatchLater } from '../api'
 import VideoCard from '../components/VideoCard'
+import SkeletonCard from '../components/SkeletonCard'
 import './WatchLater.css'
 
 export default function WatchLater() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('')
 
   useEffect(() => {
     getWatchLater()
@@ -22,22 +24,45 @@ export default function WatchLater() {
     } catch { /* ignore */ }
   }
 
-  if (loading) return <div className="page-loader"><div className="spinner" /></div>
+  const filtered = filter
+    ? items.filter(i => i.video?.title?.toLowerCase().includes(filter.toLowerCase()))
+    : items
+
+  if (loading) return (
+    <div className="wl-page container fade-in">
+      <div className="wl-header"><h1>Watch Later</h1></div>
+      <div className="wl-grid">
+        {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+      </div>
+    </div>
+  )
 
   return (
     <div className="wl-page container fade-in">
       <div className="wl-header">
         <h1>Watch Later</h1>
-        <p>{items.length} saved {items.length === 1 ? 'video' : 'videos'}</p>
+        <p>{filtered.length}{filter ? ` of ${items.length}` : ''} {items.length === 1 ? 'video' : 'videos'}</p>
       </div>
+      {items.length > 0 && (
+        <div className="wl-filter">
+          <input
+            className="wl-filter-input"
+            placeholder="Search saved videos…"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+          />
+        </div>
+      )}
       {items.length === 0 ? (
         <div className="wl-empty">
           <p>Nothing saved yet.</p>
           <Link to="/home" className="btn btn-primary">Explore Content</Link>
         </div>
+      ) : filtered.length === 0 ? (
+        <div className="wl-empty"><p>No videos match "{filter}".</p></div>
       ) : (
         <div className="wl-grid">
-          {items.map((item) => (
+          {filtered.map((item) => (
             item.video && (
               <div key={item.id} className="wl-item">
                 <VideoCard item={item.video} type="video" />

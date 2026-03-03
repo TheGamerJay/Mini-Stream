@@ -140,6 +140,83 @@
 .dropdown-item--danger { color: #f87171; }
 .dropdown-item--danger:hover { background: rgba(239,68,68,0.1); color: #f87171; }
 
+/* Search */
+.navbar__search { display: flex; align-items: center; }
+.navbar__search-toggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+.navbar__search-toggle:hover { color: #fff; background: var(--bg-hover); }
+.navbar__search-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  animation: fadeIn 0.15s ease;
+}
+.navbar__search-input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  width: 200px;
+}
+.navbar__search-input::placeholder { color: var(--text-muted); }
+.navbar__search-icon {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color 0.15s;
+}
+.navbar__search-icon:hover { color: var(--cyan); }
+.navbar__search-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  transition: color 0.15s;
+}
+.navbar__search-close:hover { color: #fff; }
+
+/* Mobile search */
+.mobile-search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-search-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  outline: none;
+}
+.mobile-search-input::placeholder { color: var(--text-muted); }
+
 /* Hamburger button — hidden on desktop */
 .navbar__hamburger {
   display: none;
