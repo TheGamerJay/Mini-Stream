@@ -85,6 +85,127 @@
   outline: none;
 }
 
+/* ── Episode navigation strip ───────────────────────────────── */
+.watch-episodes-strip {
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 18px 0;
+}
+.watch-episodes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.watch-episodes-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.watch-episodes-all {
+  font-size: 0.78rem;
+  color: var(--cyan);
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.watch-episodes-all:hover { opacity: 0.75; }
+
+.watch-episodes-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.12) transparent;
+}
+.watch-episodes-scroll::-webkit-scrollbar { height: 4px; }
+.watch-episodes-scroll::-webkit-scrollbar-track { background: transparent; }
+.watch-episodes-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+.watch-ep-card {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.watch-ep-card:hover {
+  border-color: rgba(0,212,255,0.35);
+  box-shadow: 0 4px 18px rgba(0,212,255,0.12);
+  transform: translateY(-2px);
+}
+.watch-ep-card--active {
+  border-color: rgba(0,212,255,0.6);
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.3), 0 4px 20px rgba(0,212,255,0.2);
+}
+.watch-ep-card--active:hover { transform: none; }
+
+.watch-ep-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #0d0d1a;
+  overflow: hidden;
+}
+.watch-ep-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.watch-ep-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a2e, #0d0d1a);
+}
+.watch-ep-playing {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.04em;
+}
+
+.watch-ep-info {
+  padding: 8px 10px 10px;
+}
+.watch-ep-num {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+.watch-ep-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.watch-ep-dur {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 /* ── Body layout ────────────────────────────────────────────── */
 .watch-body {
   display: grid;

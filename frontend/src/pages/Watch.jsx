@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated, getNextEpisode, getRating, setRating, deleteRating, donateToCreator } from '../api'
+import { getVideo, addWatchLater, removeWatchLater, getWatchLaterStatus, reportVideo, saveProgress, getVideoProgress, getReaction, setReaction, getRelated, getNextEpisode, getRating, setRating, deleteRating, donateToCreator, getSeries } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import VideoCard from '../components/VideoCard'
@@ -106,6 +106,9 @@ export default function Watch() {
         getRelated(id).then(({ data: r }) => setRelated(r.related || [])).catch(() => {})
         if (data.video.series_id) {
           getNextEpisode(id).then(({ data: n }) => setNextEpisode(n.next || null)).catch(() => {})
+          getSeries(data.video.series_id).then(({ data: s }) => setSeriesEpisodes(s.series?.episodes || [])).catch(() => {})
+        } else {
+          setSeriesEpisodes([])
         }
         getRating(id).then(({ data: r }) => { setAvgRating(r.average); setRatingCount(r.count); setMyRating(r.mine) }).catch(() => {})
         if (user) {
@@ -437,6 +440,43 @@ export default function Watch() {
         )}
       </div>
       </div>{/* end watch-player-section */}
+
+      {/* Episode navigation strip */}
+      {seriesEpisodes.length > 0 && (
+        <div className="watch-episodes-strip">
+          <div className="container">
+            <div className="watch-episodes-header">
+              <span className="watch-episodes-title">{video.series_title}</span>
+              <Link to={`/series/${video.series_id}`} className="watch-episodes-all">View All →</Link>
+            </div>
+            <div className="watch-episodes-scroll">
+              {seriesEpisodes.map((ep) => (
+                <Link
+                  key={ep.id}
+                  to={`/watch/${ep.id}`}
+                  className={`watch-ep-card${ep.id === Number(id) ? ' watch-ep-card--active' : ''}`}
+                >
+                  <div className="watch-ep-thumb">
+                    {ep.thumbnail_url
+                      ? <img src={ep.thumbnail_url} alt={ep.title} />
+                      : <div className="watch-ep-thumb-placeholder" />}
+                    {ep.id === Number(id) && <div className="watch-ep-playing">▶ Playing</div>}
+                  </div>
+                  <div className="watch-ep-info">
+                    <div className="watch-ep-num">
+                      S{ep.season_number || 1} E{ep.episode_number}
+                    </div>
+                    <div className="watch-ep-name">{ep.title}</div>
+                    {ep.duration_formatted && (
+                      <div className="watch-ep-dur">{ep.duration_formatted}</div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="container watch-body">
         <div className="watch-main">
