@@ -385,6 +385,12 @@ export default function Watch() {
             />
           )}
         </video>
+        {/* PiP overlay button — top-right corner of video */}
+        {document.pictureInPictureEnabled && (
+          <button className="watch-pip-overlay" onClick={handlePiP} title="Picture-in-Picture">
+            ⧉
+          </button>
+        )}
         {showSkipRecap && (
           <button className="watch-skip-btn watch-skip-recap" onClick={skipRecap}>
             Skip Recap ▶▶
@@ -519,11 +525,6 @@ export default function Watch() {
                 {copied ? '✓ Copied!' : '⬆ Share'}
               </button>
             )}
-
-            {/* Picture-in-Picture */}
-            <button className="btn btn-ghost watch-pip-btn" onClick={handlePiP} title="Picture-in-Picture">
-              ⧉ PiP
-            </button>
 
             {/* Embed */}
             {video.allow_sharing && (
