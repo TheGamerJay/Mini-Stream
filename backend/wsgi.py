@@ -10,7 +10,8 @@ try:
     with application.app_context():
         db.create_all()
         print("Database tables created/verified.")
-        # Safe ALTER TABLE migrations for new columns on existing tables
+        # Safe ALTER TABLE migrations — each runs in its own connection/transaction
+        # so a failure on one column never blocks the rest.
         from sqlalchemy import text
         migrations = [
             "ALTER TABLE videos ADD COLUMN IF NOT EXISTS subtitle_url VARCHAR(500)",
@@ -23,12 +24,15 @@ try:
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE NOT NULL",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT FALSE NOT NULL",
         ]
+        applied = 0
         for sql in migrations:
             try:
-                db.session.execute(text(sql))
+                with db.engine.connect() as conn:
+                    conn.execute(text(sql))
+                    conn.commit()
+                applied += 1
             except Exception:
                 pass
-        db.session.commit()
-        print("Column migrations applied.")
+        print(f"Column migrations applied ({applied}/{len(migrations)}).")
 except Exception as e:
     print(f"Warning: could not run db.create_all() on startup: {e}")
