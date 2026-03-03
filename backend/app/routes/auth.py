@@ -14,7 +14,7 @@ from flask_jwt_extended import (
 )
 import requests as http_requests
 import resend
-from .. import db, bcrypt
+from .. import db, bcrypt, limiter
 from ..models.user import User
 
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
@@ -23,6 +23,7 @@ auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/signup', methods=['POST'])
+@limiter.limit("10 per hour")
 def signup():
     data = request.get_json()
     if not data:
@@ -86,6 +87,7 @@ def signup():
 
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("20 per hour")
 def login():
     data = request.get_json()
     if not data:

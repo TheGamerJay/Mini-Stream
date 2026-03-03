@@ -17,6 +17,12 @@ class User(db.Model):
     google_id = db.Column(db.String(255), unique=True, nullable=True)
     reset_token = db.Column(db.String(255), nullable=True)
     reset_token_expires = db.Column(db.DateTime, nullable=True)
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
+    email_verify_token = db.Column(db.String(255), nullable=True)
+    preferred_genres = db.Column(db.Text, nullable=True)  # JSON array string
+    onboarding_done = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    is_banned = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
@@ -27,6 +33,13 @@ class User(db.Model):
     watch_later = db.relationship('WatchLater', backref='user', lazy='dynamic')
 
     def to_dict(self):
+        import json
+        genres = []
+        if self.preferred_genres:
+            try:
+                genres = json.loads(self.preferred_genres)
+            except Exception:
+                pass
         return {
             'id': self.id,
             'email': self.email,
@@ -36,6 +49,11 @@ class User(db.Model):
             'website': self.website,
             'location': self.location,
             'is_creator': self.is_creator,
+            'is_admin': self.is_admin,
+            'is_banned': self.is_banned,
+            'email_verified': self.email_verified,
+            'onboarding_done': self.onboarding_done,
+            'preferred_genres': genres,
             'has_password': self.password_hash is not None,
             'created_at': self.created_at.isoformat(),
         }

@@ -8,6 +8,7 @@ from ..models.video import Video
 from ..models.watch_later import WatchLater
 from ..models.watch_history import WatchHistory
 from ..models.reaction import Reaction
+from ..models.report import Report
 
 logger = logging.getLogger(__name__)
 resend.api_key = os.environ.get('RESEND_API_KEY', '')
@@ -270,7 +271,8 @@ def report_video(video_id):
     reason = data.get('reason', 'Not specified')
     notes = data.get('notes', '').strip()[:500]
 
-    reporter = 'Anonymous'
+    reporter_id = None
+    reporter_str = 'Anonymous'
     try:
         verify_jwt_in_request(optional=True)
         uid = get_jwt_identity()
@@ -278,9 +280,15 @@ def report_video(video_id):
             from ..models.user import User
             u = User.query.get(int(uid))
             if u:
-                reporter = f'{u.display_name} ({u.email})'
+                reporter_id = u.id
+                reporter_str = f'{u.display_name} ({u.email})'
     except Exception:
         pass
+
+    # Save report to DB
+    report = Report(video_id=video_id, reporter_id=reporter_id, reason=reason, notes=notes)
+    db.session.add(report)
+    db.session.commit()
 
     base_url = os.environ.get('FRONTEND_URL', 'https://ministream.online')
     from_addr = os.environ.get('RESEND_FROM', 'MiniStream <noreply@ministream.online>')
@@ -296,7 +304,7 @@ def report_video(video_id):
                     <p><strong>Creator:</strong> {video.creator.display_name if video.creator else '—'}</p>
                     <p><strong>Reason:</strong> {reason}</p>
                     <p><strong>Notes:</strong> {notes or '—'}</p>
-                    <p><strong>Reported by:</strong> {reporter}</p>
+                    <p><strong>Reported by:</strong> {reporter_str}</p>
                     <a href="{base_url}/watch/{video.id}" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#f87171;color:#000;border-radius:8px;text-decoration:none;font-weight:700;">View Video</a>
                 </div>
             ''',

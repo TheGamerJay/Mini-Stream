@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
+from .. import db, cache
 from ..models.video import Video
 from ..models.series import Series
+from ..models.user import User
 
 discover_bp = Blueprint('discover', __name__)
 
@@ -15,6 +17,7 @@ RATINGS = ['G', 'PG', 'PG-13', 'R', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'NR']
 
 
 @discover_bp.route('/home', methods=['GET'])
+@cache.cached(timeout=90, key_prefix='home_data')
 def home():
     featured_series = (
         Series.query.filter_by(is_published=True)
@@ -96,8 +99,30 @@ def search():
     series_query = Series.query.filter_by(is_published=True)
 
     if q:
-        video_query = video_query.filter(Video.title.ilike(f'%{q}%'))
-        series_query = series_query.filter(Series.title.ilike(f'%{q}%'))
+        # Use PostgreSQL full-text search when available, fall back to ilike
+        try:
+            from sqlalchemy import text as sql_text
+            from .. import db
+            fts_filter = sql_text(
+                "to_tsvector('english', coalesce(title,'') || ' ' || coalesce(description,'')) "
+                "@@ plainto_tsquery('english', :q)"
+            )
+            video_query = video_query.filter(fts_filter.bindparams(q=q))
+            series_q2 = series_query.filter(Series.title.ilike(f'%{q}%'))
+        except Exception:
+            video_query = video_query.filter(Video.title.ilike(f'%{q}%'))
+            series_q2 = series_query.filter(Series.title.ilike(f'%{q}%'))
+        series_query = series_q2
+        # Also search by creator name
+        creator_match = (
+            Video.query.join(User, User.id == Video.creator_id)
+            .filter(Video.is_published == True, User.display_name.ilike(f'%{q}%'))
+            .order_by(Video.view_count.desc())
+            .limit(10)
+            .all()
+        )
+    else:
+        creator_match = []
     if genre:
         video_query = video_query.filter_by(genre=genre)
         series_query = series_query.filter_by(genre=genre)
@@ -106,6 +131,12 @@ def search():
         series_query = series_query.filter_by(language=language)
 
     videos = video_query.order_by(Video.view_count.desc()).limit(24).all()
+    # Merge creator-match results (dedup by id)
+    seen = {v.id for v in videos}
+    for v in creator_match:
+        if v.id not in seen:
+            videos.append(v)
+            seen.add(v.id)
     series = series_query.order_by(Series.created_at.desc()).limit(12).all()
 
     return jsonify({
@@ -127,7 +158,9 @@ def browse():
 
     video_query = Video.query.filter_by(is_published=True)
     if q:
-        video_query = video_query.filter(Video.title.ilike(f'%{q}%'))
+        video_query = video_query.outerjoin(User, User.id == Video.creator_id).filter(
+            db.or_(Video.title.ilike(f'%{q}%'), User.display_name.ilike(f'%{q}%'))
+        )
     if genre:
         video_query = video_query.filter_by(genre=genre)
     if language:
@@ -160,7 +193,7 @@ def browse():
 
 @discover_bp.route('/creator/<int:creator_id>', methods=['GET'])
 def get_creator_profile(creator_id):
-    from ..models.user import User
+    from ..models.follow import Follow
     user = User.query.get_or_404(creator_id)
     if not user.is_creator:
         return jsonify({'error': 'Not a creator'}), 404
@@ -170,16 +203,85 @@ def get_creator_profile(creator_id):
         .limit(50)
         .all()
     )
+    follower_count = Follow.query.filter_by(followed_id=creator_id).count()
+    total_views = sum(v.view_count for v in videos)
     creator_data = {
         'id': user.id,
         'display_name': user.display_name,
         'bio': user.bio,
         'avatar_url': user.avatar_url,
-        'website': getattr(user, 'website', None),
-        'location': getattr(user, 'location', None),
+        'website': user.website,
+        'location': user.location,
         'video_count': len(videos),
+        'follower_count': follower_count,
+        'total_views': total_views,
     }
     return jsonify({'creator': creator_data, 'videos': [v.to_dict() for v in videos]})
+
+
+@discover_bp.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    q = request.args.get('q', '').strip()
+    if not q or len(q) < 2:
+        return jsonify({'suggestions': []})
+    # Video titles
+    videos = (
+        Video.query.filter(Video.is_published == True, Video.title.ilike(f'%{q}%'))
+        .order_by(Video.view_count.desc())
+        .limit(5)
+        .all()
+    )
+    # Creator names
+    creators = (
+        User.query.filter(User.is_creator == True, User.display_name.ilike(f'%{q}%'))
+        .limit(3)
+        .all()
+    )
+    suggestions = [{'type': 'video', 'id': v.id, 'label': v.title} for v in videos]
+    suggestions += [{'type': 'creator', 'id': u.id, 'label': u.display_name} for u in creators]
+    return jsonify({'suggestions': suggestions})
+
+
+@discover_bp.route('/announcement', methods=['GET'])
+def get_announcement():
+    from ..models.announcement import Announcement
+    ann = Announcement.query.filter_by(is_active=True).order_by(Announcement.created_at.desc()).first()
+    return jsonify({'announcement': ann.to_dict() if ann else None})
+
+
+@discover_bp.route('/creator/<int:creator_id>/rss', methods=['GET'])
+def creator_rss(creator_id):
+    user = User.query.get_or_404(creator_id)
+    if not user.is_creator:
+        return Response('Not a creator', status=404)
+    videos = (
+        Video.query.filter_by(creator_id=creator_id, is_published=True)
+        .order_by(Video.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    base = request.host_url.rstrip('/')
+    items_xml = ''
+    for v in videos:
+        items_xml += f'''
+    <item>
+      <title><![CDATA[{v.title}]]></title>
+      <link>{base}/watch/{v.id}</link>
+      <description><![CDATA[{v.description or ''}]]></description>
+      <pubDate>{v.created_at.strftime('%a, %d %b %Y %H:%M:%S +0000')}</pubDate>
+      <guid>{base}/watch/{v.id}</guid>
+      {'<enclosure url="' + v.video_url + '" type="video/mp4"/>' if v.video_url else ''}
+    </item>'''
+    rss = f'''<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title><![CDATA[{user.display_name} on MiniStream]]></title>
+    <link>{base}/creator/{creator_id}</link>
+    <description><![CDATA[{user.bio or f'Videos by {user.display_name}'}]]></description>
+    {items_xml}
+  </channel>
+</rss>'''
+    return Response(rss, mimetype='application/rss+xml')
 
 
 @discover_bp.route('/genres', methods=['GET'])

@@ -20,13 +20,16 @@ class Video(db.Model):
     thumbnail_url = db.Column(db.String(500), nullable=True)
     cloudinary_public_id = db.Column(db.String(255), nullable=True)
 
-    duration = db.Column(db.Integer, nullable=True)  # seconds
+    duration = db.Column(db.Integer, nullable=True)
     allow_sharing = db.Column(db.Boolean, default=True, nullable=False)
-    intro_start = db.Column(db.Integer, nullable=True)  # seconds
-    intro_end = db.Column(db.Integer, nullable=True)    # seconds
-    recap_end = db.Column(db.Integer, nullable=True)    # seconds
+    intro_start = db.Column(db.Integer, nullable=True)
+    intro_end = db.Column(db.Integer, nullable=True)
+    recap_end = db.Column(db.Integer, nullable=True)
     episode_number = db.Column(db.Integer, nullable=True)
     season_number = db.Column(db.Integer, default=1)
+    subtitle_url = db.Column(db.String(500), nullable=True)
+    scheduled_publish_at = db.Column(db.DateTime, nullable=True)
+    is_approved = db.Column(db.Boolean, default=True, nullable=False)
 
     view_count = db.Column(db.Integer, default=0, nullable=False)
     is_published = db.Column(db.Boolean, default=True, nullable=False)
@@ -43,6 +46,8 @@ class Video(db.Model):
         'WatchHistory', backref='video', lazy='dynamic'
     )
     reactions = db.relationship('Reaction', backref='video', lazy='dynamic')
+    comments = db.relationship('Comment', backref='video', lazy='dynamic',
+                               primaryjoin='Comment.video_id == Video.id')
 
     def format_duration(self):
         if not self.duration:
@@ -78,5 +83,8 @@ class Video(db.Model):
             'view_count': self.view_count,
             'is_published': self.is_published,
             'allow_sharing': self.allow_sharing,
+            'subtitle_url': self.subtitle_url,
+            'scheduled_publish_at': self.scheduled_publish_at.isoformat() if self.scheduled_publish_at else None,
+            'is_approved': self.is_approved,
             'created_at': self.created_at.isoformat(),
         }

@@ -5,6 +5,9 @@ from .. import db, bcrypt
 from ..models.user import User
 from ..models.video import Video
 from ..models.series import Series
+from ..models.report import Report
+from ..models.announcement import Announcement
+from ..models.audit_log import AuditLog
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -87,7 +90,10 @@ def admin_users():
                 'id': u.id,
                 'email': u.email,
                 'display_name': u.display_name,
+                'avatar_url': u.avatar_url,
                 'is_creator': u.is_creator,
+                'is_banned': getattr(u, 'is_banned', False),
+                'is_admin': getattr(u, 'is_admin', False),
                 'google_id': u.google_id,
                 'created_at': u.created_at.isoformat(),
                 'video_count': u.videos.count(),
@@ -194,6 +200,198 @@ def admin_delete_video(video_id):
     db.session.delete(video)
     db.session.commit()
     return jsonify({'message': 'Video deleted'})
+
+
+# ── User management ───────────────────────────────────────────────────────────
+
+@admin_bp.route('/users/<int:user_id>/ban', methods=['POST'])
+@require_admin
+def admin_ban_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_banned = True
+    log = AuditLog(action='ban_user', details=f'Banned user {user.email} (id={user_id})')
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'message': 'User banned'})
+
+
+@admin_bp.route('/users/<int:user_id>/unban', methods=['POST'])
+@require_admin
+def admin_unban_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_banned = False
+    log = AuditLog(action='unban_user', details=f'Unbanned user {user.email} (id={user_id})')
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'message': 'User unbanned'})
+
+
+@admin_bp.route('/users/<int:user_id>/toggle-creator', methods=['POST'])
+@require_admin
+def admin_toggle_creator(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_creator = not user.is_creator
+    log = AuditLog(action='toggle_creator', details=f'Set is_creator={user.is_creator} for {user.email}')
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'is_creator': user.is_creator})
+
+
+# ── Reports moderation ────────────────────────────────────────────────────────
+
+@admin_bp.route('/reports', methods=['GET'])
+@require_admin
+def admin_reports():
+    page = request.args.get('page', 1, type=int)
+    status = request.args.get('status', 'pending')
+    query = Report.query
+    if status != 'all':
+        query = query.filter_by(status=status)
+    paginated = query.order_by(Report.created_at.desc()).paginate(
+        page=page, per_page=20, error_out=False
+    )
+    return jsonify({
+        'reports': [r.to_dict() for r in paginated.items],
+        'total': paginated.total,
+        'pages': paginated.pages,
+        'page': page,
+    })
+
+
+@admin_bp.route('/reports/<int:report_id>', methods=['PATCH'])
+@require_admin
+def admin_update_report(report_id):
+    report = Report.query.get_or_404(report_id)
+    data = request.get_json() or {}
+    status = data.get('status')
+    if status in ('reviewed', 'dismissed', 'pending'):
+        report.status = status
+    db.session.commit()
+    return jsonify({'report': report.to_dict()})
+
+
+# ── Video approval ────────────────────────────────────────────────────────────
+
+@admin_bp.route('/videos/<int:video_id>/approve', methods=['POST'])
+@require_admin
+def admin_approve_video(video_id):
+    video = Video.query.get_or_404(video_id)
+    video.is_approved = True
+    video.is_published = True
+    log = AuditLog(action='approve_video', details=f'Approved video "{video.title}" (id={video_id})')
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'message': 'Video approved'})
+
+
+@admin_bp.route('/videos/<int:video_id>/reject', methods=['POST'])
+@require_admin
+def admin_reject_video(video_id):
+    video = Video.query.get_or_404(video_id)
+    video.is_approved = False
+    video.is_published = False
+    log = AuditLog(action='reject_video', details=f'Rejected video "{video.title}" (id={video_id})')
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'message': 'Video rejected'})
+
+
+@admin_bp.route('/videos/pending-approval', methods=['GET'])
+@require_admin
+def admin_pending_videos():
+    page = request.args.get('page', 1, type=int)
+    paginated = (
+        Video.query.filter_by(is_approved=False)
+        .order_by(Video.created_at.desc())
+        .paginate(page=page, per_page=20, error_out=False)
+    )
+    return jsonify({
+        'videos': [{'id': v.id, 'title': v.title, 'creator_name': v.creator.display_name if v.creator else None,
+                    'genre': v.genre, 'created_at': v.created_at.isoformat()} for v in paginated.items],
+        'total': paginated.total,
+        'pages': paginated.pages,
+    })
+
+
+# ── Announcements ─────────────────────────────────────────────────────────────
+
+@admin_bp.route('/announcements', methods=['GET'])
+@require_admin
+def admin_get_announcements():
+    anns = Announcement.query.order_by(Announcement.created_at.desc()).limit(20).all()
+    return jsonify({'announcements': [a.to_dict() for a in anns]})
+
+
+@admin_bp.route('/announcements', methods=['POST'])
+@require_admin
+def admin_create_announcement():
+    data = request.get_json() or {}
+    message = (data.get('message') or '').strip()
+    if not message:
+        return jsonify({'error': 'Message required'}), 400
+    ann = Announcement(
+        message=message[:500],
+        type=data.get('type', 'info'),
+        is_active=bool(data.get('is_active', True)),
+    )
+    db.session.add(ann)
+    db.session.commit()
+    return jsonify({'announcement': ann.to_dict()}), 201
+
+
+@admin_bp.route('/announcements/<int:ann_id>', methods=['DELETE'])
+@require_admin
+def admin_delete_announcement(ann_id):
+    ann = Announcement.query.get_or_404(ann_id)
+    db.session.delete(ann)
+    db.session.commit()
+    return jsonify({'message': 'Deleted'})
+
+
+@admin_bp.route('/announcements/<int:ann_id>/toggle', methods=['POST'])
+@require_admin
+def admin_toggle_announcement(ann_id):
+    ann = Announcement.query.get_or_404(ann_id)
+    ann.is_active = not ann.is_active
+    db.session.commit()
+    return jsonify({'is_active': ann.is_active})
+
+
+# ── Audit log ─────────────────────────────────────────────────────────────────
+
+@admin_bp.route('/audit-log', methods=['GET'])
+@require_admin
+def admin_audit_log():
+    page = request.args.get('page', 1, type=int)
+    paginated = (
+        AuditLog.query
+        .order_by(AuditLog.created_at.desc())
+        .paginate(page=page, per_page=50, error_out=False)
+    )
+    return jsonify({
+        'logs': [l.to_dict() for l in paginated.items],
+        'total': paginated.total,
+        'pages': paginated.pages,
+        'page': page,
+    })
+
+
+# ── Storage stats ─────────────────────────────────────────────────────────────
+
+@admin_bp.route('/storage', methods=['GET'])
+@require_admin
+def admin_storage():
+    try:
+        import cloudinary
+        result = cloudinary.api.usage()
+        return jsonify({
+            'storage_mb': round(result.get('storage', {}).get('usage', 0) / 1024 / 1024, 2),
+            'bandwidth_mb': round(result.get('bandwidth', {}).get('usage', 0) / 1024 / 1024, 2),
+            'transformations': result.get('transformations', {}).get('usage', 0),
+            'resources': result.get('resources', 0),
+        })
+    except Exception as e:
+        return jsonify({'error': str(e), 'storage_mb': 0, 'bandwidth_mb': 0})
 
 
 # ── Demo seed / clear ─────────────────────────────────────────────────────────
