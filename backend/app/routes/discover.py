@@ -156,17 +156,17 @@ def browse():
     page = request.args.get('page', 1, type=int)
     per_page = 24
 
-    video_query = Video.query.filter_by(is_published=True)
+    video_query = Video.query.filter(Video.is_published == True)
     if q:
         video_query = video_query.outerjoin(User, User.id == Video.creator_id).filter(
             db.or_(Video.title.ilike(f'%{q}%'), User.display_name.ilike(f'%{q}%'))
         )
     if genre:
-        video_query = video_query.filter_by(genre=genre)
+        video_query = video_query.filter(Video.genre == genre)
     if language:
-        video_query = video_query.filter_by(language=language)
+        video_query = video_query.filter(Video.language == language)
     if rating:
-        video_query = video_query.filter_by(content_rating=rating)
+        video_query = video_query.filter(Video.content_rating == rating)
     if type_filter == 'movie':
         video_query = video_query.filter(Video.video_type.in_(['Movie', 'Movie Adaptation']))
     elif type_filter == 'show':
